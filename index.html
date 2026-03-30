@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rotary Club Satu Mare Cetate — Trezorerie</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --rot:#003F87;--rot2:#0056B3;--rot-l:#E8F0FB;
+  --gold:#C9A84C;--gold-p:#FFF8E7;
+  --text:#1a2a3a;--text2:#4a5a6a;--text3:#8a9aaa;
+  --bg:#f0f4f8;--bg2:#e4eaf2;--bg3:#d8e2ee;
+  --bdr:rgba(0,63,135,0.15);--bdr2:rgba(0,63,135,0.3);
+  --green:#2D6A4F;--gbg:#D8F3DC;
+  --red:#9B2335;--rbg:#FDECEA;
+  --amber:#8B4F00;--abg:#FFF0D6;
+  --r:10px;--sh:0 2px 16px rgba(0,63,135,0.10);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+h1,h2,h3{font-family:'Crimson Pro',serif;font-weight:600}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:230px;min-height:100vh;background:var(--rot);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:100}
+.sb-logo{padding:18px 18px 14px;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:10px}
+.sb-logo-icon{width:42px;height:42px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.sb-logo-text .loja{font-family:'Crimson Pro',serif;font-size:13px;color:white;font-weight:600;line-height:1.3}
+.sb-logo-text .sub{font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px}
+nav{flex:1;padding:10px 0}
+.ns{font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:1.5px;text-transform:uppercase;padding:12px 18px 4px}
+.ni{display:flex;align-items:center;gap:9px;padding:9px 18px;font-size:13px;color:rgba(255,255,255,0.6);cursor:pointer;transition:all 0.15s;border:none;background:none;width:100%;text-align:left;border-left:2px solid transparent}
+.ni:hover{color:white;background:rgba(255,255,255,0.08)}
+.ni.active{color:white;background:rgba(255,255,255,0.15);border-left-color:var(--gold);font-weight:500}
+.ni .ic{width:16px;text-align:center;font-size:13px}
+.sb-foot{padding:12px 18px;border-top:1px solid rgba(255,255,255,0.1);font-size:11px;color:rgba(255,255,255,0.3)}
+.main{margin-left:230px;flex:1;display:flex;flex-direction:column}
+.topbar{background:white;border-bottom:1px solid var(--bdr);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--sh)}
+.tb-title{font-family:'Crimson Pro',serif;font-size:20px;font-weight:600;color:var(--rot)}
+.tb-sub{font-size:12px;color:var(--text3);margin-top:1px}
+.tb-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.content{padding:24px 28px;flex:1}
+.btn{padding:7px 14px;font-size:13px;border-radius:7px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;border:none;display:inline-flex;align-items:center;gap:5px}
+.btn-rot{background:var(--rot);color:white}.btn-rot:hover{background:var(--rot2)}
+.btn-gold{background:var(--gold);color:white}.btn-gold:hover{opacity:.88}
+.btn-outline{background:transparent;border:1px solid var(--bdr2);color:var(--text2)}.btn-outline:hover{background:var(--bg2)}
+.btn-red{background:var(--red);color:white}.btn-red:hover{opacity:.88}
+.btn-sm{padding:4px 10px;font-size:12px}
+.btn-xs{padding:3px 8px;font-size:11px}
+.panel{display:none}.panel.active{display:block}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px}
+.metric{background:white;border:1px solid var(--bdr);border-radius:var(--r);padding:12px 14px}
+.metric-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+.metric-val{font-family:'Crimson Pro',serif;font-size:22px;font-weight:600}
+.mv-g{color:var(--green)}.mv-r{color:var(--red)}.mv-a{color:var(--amber)}.mv-b{color:var(--rot)}.mv-gold{color:var(--gold)}
+.card{background:white;border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);margin-bottom:16px}
+.card-hdr{padding:12px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;background:var(--bg2);flex-wrap:wrap;gap:8px}
+.card-title{font-family:'Crimson Pro',serif;font-size:15px;font-weight:600;color:var(--rot)}
+.card-body{padding:14px 16px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 10px;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);font-weight:500;border-bottom:1px solid var(--bdr);background:var(--bg2);white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid var(--bdr);color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--rot-l)}
+.td-actions{display:flex;gap:4px;align-items:center}
+.badge{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500;white-space:nowrap;display:inline-block}
+.bg-green{background:var(--gbg);color:var(--green)}
+.bg-red{background:var(--rbg);color:var(--red)}
+.bg-amber{background:var(--abg);color:var(--amber)}
+.bg-blue{background:var(--rot-l);color:var(--rot)}
+.bg-gold{background:var(--gold-p);color:var(--amber)}
+.filter-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.fi{padding:7px 11px;font-size:13px;border:1px solid var(--bdr2);border-radius:7px;background:white;color:var(--text);font-family:'DM Sans',sans-serif}
+.fi:focus{outline:none;border-color:var(--rot)}
+.fi-wide{flex:1;min-width:160px}
+.fb{padding:5px 12px;font-size:12px;border:1px solid var(--bdr);border-radius:20px;background:white;color:var(--text2);cursor:pointer;transition:all 0.15s}
+.fb.active{background:var(--rot);color:white;border-color:var(--rot)}
+.fb:hover:not(.active){border-color:var(--rot2);color:var(--rot)}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:white;border-radius:14px;width:90%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 48px rgba(0,0,0,0.3)}
+.modal-hdr{padding:18px 22px 14px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-family:'Crimson Pro',serif;font-size:17px;font-weight:600;color:var(--rot)}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3)}
+.modal-body{padding:18px 22px}
+.modal-foot{padding:10px 22px 18px;display:flex;gap:8px;justify-content:flex-end;align-items:center}
+.fg{margin-bottom:12px}
+.fl{font-size:12px;color:var(--text2);margin-bottom:3px;display:block;font-weight:500}
+.fi2{width:100%;padding:8px 10px;font-size:13px;border:1px solid var(--bdr2);border-radius:7px;background:white;color:var(--text);font-family:'DM Sans',sans-serif}
+.fi2:focus{outline:none;border-color:var(--rot)}
+textarea.fi2{min-height:60px;resize:vertical}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.itabs{display:flex;border-bottom:1px solid var(--bdr);margin-bottom:18px}
+.itab{padding:8px 16px;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;color:var(--text3);background:none;border-top:none;border-left:none;border-right:none;font-family:'DM Sans',sans-serif;margin-bottom:-1px;transition:all .15s}
+.itab.active{color:var(--rot);border-bottom-color:var(--rot);font-weight:500}
+.empty{text-align:center;padding:32px 16px;color:var(--text3)}
+.prog-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px}
+.prog-name{width:160px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prog-track{flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px}
+.pf-full{background:var(--green)}.pf-part{background:#E9A400}.pf-none{background:#E24B4A;opacity:.3}
+.prog-amt{width:80px;text-align:right;color:var(--text3);font-size:11px}
+#print-area{display:none}
+@media print{body>*{display:none!important}#print-area{display:block!important;padding:20px;font-family:'DM Sans',sans-serif}}
+</style>
+</head>
+<body>
+<div id="print-area"></div>
+<div class="layout">
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">⚙️</div>
+    <div class="sb-logo-text">
+      <div class="loja">Rotary Club<br>Satu Mare Cetate</div>
+      <div class="sub">Trezorerie · 2025-2026</div>
+    </div>
+  </div>
+  <nav>
+    <div class="ns">Cotizații</div>
+    <button class="ni active" onclick="nav('cotizatii',this)"><span class="ic">👥</span>Situație cotizații</button>
+    <div class="ns">Financiar</div>
+    <button class="ni" onclick="nav('donatii',this)"><span class="ic">🎁</span>Donații</button>
+    <button class="ni" onclick="nav('casa',this)"><span class="ic">💵</span>Registru casă</button>
+    <button class="ni" onclick="nav('banca',this)"><span class="ic">🏦</span>Jurnal bancă</button>
+    <div class="ns">Plăți externe</div>
+    <button class="ni" onclick="nav('rotary_int',this)"><span class="ic">🌍</span>Rotary Intl / District</button>
+    <button class="ni" onclick="nav('protocol',this)"><span class="ic">🍽</span>Protocol & Evenimente</button>
+    <div class="ns">Analiză</div>
+    <button class="ni" onclick="nav('rapoarte',this)"><span class="ic">📊</span>Rapoarte</button>
+  </nav>
+  <div class="sb-foot">v1.0 · RC SM Cetate · 2026</div>
+</aside>
+<div class="main">
+<div class="topbar">
+  <div>
+    <div class="tb-title" id="tb-title">Cotizații membri</div>
+    <div class="tb-sub" id="tb-sub">100 RON/lună per membru</div>
+  </div>
+  <div class="tb-actions">
+    <button class="btn btn-outline btn-sm" onclick="exportJSON()">⬇ Backup</button>
+    <button class="btn btn-outline btn-sm" onclick="document.getElementById('import-f').click()">⬆ Import</button>
+    <input type="file" id="import-f" style="display:none" accept=".json" onchange="importJSON(event)">
+    <button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red)" onclick="resetData()">↺ Reset</button>
+  </div>
+</div>
+<div class="content">
+
+<!-- COTIZATII -->
+<div id="p-cotizatii" class="panel active">
+  <div class="metrics" id="cot-metrics"></div>
+  <div class="filter-row">
+    <button class="btn btn-rot btn-sm" onclick="openIncasareModal()">+ Înregistrează plată</button>
+    <button class="btn btn-outline btn-sm" onclick="openAddMemModal()">👤 + Adaugă membru</button>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV('cot')">⬇ CSV</button>
+    <button class="btn btn-outline btn-sm" onclick="printTable('cot')">🖨 Listează</button>
+    <input class="fi fi-wide" type="text" id="cot-q" placeholder="🔍 Caută după nume..." oninput="renderCot()">
+    <select class="fi" id="cot-an" onchange="renderCotMetrics();renderCot()">
+      <option value="2026">2026 (ian–iun 2026)</option>
+      <option value="2025">2025 (nov–dec 2025)</option>
+      <option value="all">Ambii ani</option>
+    </select>
+    <button class="fb active" onclick="setF('all',this)">Toți</button>
+    <button class="fb" onclick="setF('paid',this)">Achitat</button>
+    <button class="fb" onclick="setF('partial',this)">Parțial</button>
+    <button class="fb" onclick="setF('unpaid',this)">Restant</button>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">Membri RC Satu Mare Cetate</span></div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr>
+        <th>Rol</th><th>Nume</th><th>ID Rotary</th>
+        <th>Cotizație anuală</th><th>Încasat</th><th>Rest</th>
+        <th>Ultima plată</th><th>Status</th><th></th>
+      </tr></thead>
+      <tbody id="cot-tbody"></tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- DONATII -->
+<div id="p-donatii" class="panel">
+  <div class="metrics" id="don-metrics"></div>
+  <div class="filter-row">
+    <button class="btn btn-rot btn-sm" onclick="openDonModal(null)">+ Adaugă donație</button>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV('don')">⬇ CSV</button>
+    <button class="btn btn-outline btn-sm" onclick="printTable('donatii')">🖨 Listează</button>
+    <input class="fi fi-wide" type="text" id="don-q" placeholder="🔍 Caută..." oninput="renderDon()">
+    <select class="fi" id="don-tip-f" onchange="renderDon()">
+      <option value="all">Toate</option>
+      <option value="membru">Membri</option>
+      <option value="extern">Externi</option>
+    </select>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">Registru donații</span></div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr><th>Tip</th><th>Donator</th><th>Data</th><th>Suma (RON)</th><th>Scop / Descriere</th><th></th></tr></thead>
+      <tbody id="don-tbody"></tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTRU CASA -->
+<div id="p-casa" class="panel">
+  <div class="metrics" id="casa-metrics"></div>
+  <div class="filter-row">
+    <button class="btn btn-rot btn-sm" onclick="openTranzModal('casa',null)">+ Adaugă înregistrare</button>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV('casa')">⬇ CSV</button>
+    <button class="btn btn-outline btn-sm" onclick="printTable('casa')">🖨 Listează</button>
+    <input class="fi fi-wide" type="text" id="casa-q" placeholder="🔍 Caută..." oninput="renderCasa()">
+    <select class="fi" id="casa-tip-f" onchange="renderCasa()"><option value="all">Toate</option><option value="intrare">Intrări</option><option value="iesire">Ieșiri</option></select>
+    <input class="fi" type="month" id="casa-luna" onchange="renderCasa()">
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">Registru casă</span><span id="casa-sold" style="font-size:13px;font-weight:500"></span></div>
+    <div style="overflow-x:auto">
+    <table><thead><tr><th>Tip</th><th>Platitor/Beneficiar</th><th>Data</th><th>Suma (RON)</th><th>Descriere</th><th></th></tr></thead>
+    <tbody id="casa-tbody"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- JURNAL BANCA -->
+<div id="p-banca" class="panel">
+  <div class="metrics" id="banca-metrics"></div>
+  <div class="filter-row">
+    <button class="btn btn-rot btn-sm" onclick="openTranzModal('banca',null)">+ Adaugă tranzacție</button>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV('banca')">⬇ CSV</button>
+    <button class="btn btn-outline btn-sm" onclick="printTable('banca')">🖨 Listează</button>
+    <input class="fi fi-wide" type="text" id="banca-q" placeholder="🔍 Caută..." oninput="renderBanca()">
+    <select class="fi" id="banca-tip-f" onchange="renderBanca()"><option value="all">Toate</option><option value="intrare">Credite</option><option value="iesire">Debite</option></select>
+    <input class="fi" type="month" id="banca-luna" onchange="renderBanca()">
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">Jurnal bancă</span><span id="banca-sold" style="font-size:13px;font-weight:500"></span></div>
+    <div style="overflow-x:auto">
+    <table><thead><tr><th>Tip</th><th>Platitor/Beneficiar</th><th>Data</th><th>Suma (RON)</th><th>Descriere</th><th></th></tr></thead>
+    <tbody id="banca-tbody"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ROTARY INT -->
+<div id="p-rotary_int" class="panel">
+  <div class="metrics" id="ri-metrics"></div>
+  <div class="filter-row">
+    <button class="btn btn-rot btn-sm" onclick="openRIModal()">+ Înregistrează plată</button>
+    <button class="btn btn-outline btn-sm" onclick="printTable('ri')">🖨 Listează</button>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">Plăți efectuate</span></div>
+      <div class="card-body" id="ri-plati"></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">Obligații / informații</span></div>
+      <div class="card-body">
+        <div style="font-size:13px;line-height:1.8">
+          <div>🌍 <b>Rotary International</b></div>
+          <div style="color:var(--text3);font-size:12px">Cotizație semestrială per membru</div>
+          <div style="margin-top:8px">🏛 <b>District 2241</b></div>
+          <div style="color:var(--text3);font-size:12px">Cotizație anuală district</div>
+          <div style="margin-top:8px">📅 <b>Termene:</b></div>
+          <div style="color:var(--text3);font-size:12px">Semestrul I: iulie · Semestrul II: ianuarie</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROTOCOL -->
+<div id="p-protocol" class="panel">
+  <div class="metrics" id="prot-metrics"></div>
+  <div class="filter-row">
+    <button class="btn btn-rot btn-sm" onclick="openProtModal(null)">+ Adaugă cheltuială</button>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV('protocol')">⬇ CSV</button>
+    <button class="btn btn-outline btn-sm" onclick="printTable('protocol')">🖨 Listează</button>
+    <input class="fi fi-wide" type="text" id="prot-q" placeholder="🔍 Caută..." oninput="renderProt()">
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">Protocol & Cheltuieli evenimente</span></div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr><th>Eveniment / Descriere</th><th>Data</th><th>Suma (RON)</th><th>Plătit de</th><th>Mod</th><th></th></tr></thead>
+      <tbody id="prot-tbody"></tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- RAPOARTE -->
+<div id="p-rapoarte" class="panel">
+  <div class="filter-row">
+    <button class="btn btn-outline btn-sm" onclick="printTable('rap')">🖨 Listează raport</button>
+  </div>
+  <div class="metrics" id="rap-metrics"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">Colectare cotizații</span></div>
+      <div class="card-body" id="rap-prog"></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">Restanțieri</span></div>
+      <div class="card-body" id="rap-rest"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">Solduri & sumar financiar</span></div>
+    <div class="card-body" id="rap-solduri"></div>
+  </div>
+</div>
+
+</div></div></div>
+
+<!-- MODALS -->
+<div class="overlay" id="m-incasare">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title">Înregistrare plată cotizație</span><button class="modal-close" onclick="closeModal('m-incasare')">×</button></div>
+    <div class="modal-body">
+      <div class="fg"><label class="fl">Membru *</label><select class="fi2" id="inc-mem"><option value="">— alege —</option></select><div id="inc-warn" style="margin-top:4px"></div></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Suma (RON) *</label><input class="fi2" type="number" id="inc-suma" placeholder="ex: 100"></div>
+        <div class="fg"><label class="fl">Data *</label><input class="fi2" type="date" id="inc-data"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Mod plată</label>
+          <select class="fi2" id="inc-mod"><option>Cash</option><option>BT Pay</option><option>Transfer bancar</option><option>Altă metodă</option></select>
+        </div>
+        <div class="fg"><label class="fl">Luni acoperite</label>
+          <input class="fi2" type="text" id="inc-luni" placeholder="ex: ian-feb 2026">
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Observații</label><input class="fi2" type="text" id="inc-obs"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('m-incasare')">Anulează</button>
+      <button class="btn btn-rot" onclick="saveIncasare()">Salvează & chitanță</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="m-chitanta">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title">Chitanță emisă</span><button class="modal-close" onclick="closeModal('m-chitanta')">×</button></div>
+    <div class="modal-body" id="m-chitanta-body"></div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('m-chitanta')">Închide</button>
+      <button class="btn btn-rot" onclick="printChitanta()">🖨 Printează</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="m-addmem">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title">👤 Adaugă membru nou</span><button class="modal-close" onclick="closeModal('m-addmem')">×</button></div>
+    <div class="modal-body">
+      <div class="frow">
+        <div class="fg"><label class="fl">Nume complet *</label><input class="fi2" type="text" id="am-nume" placeholder="ex: Ionescu Ioan"></div>
+        <div class="fg"><label class="fl">ID Rotary</label><input class="fi2" type="text" id="am-id" placeholder="ex: 12345678"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Rol în club</label><input class="fi2" type="text" id="am-rol" placeholder="ex: Club Member"></div>
+        <div class="fg"><label class="fl">Telefon</label><input class="fi2" type="text" id="am-tel" placeholder="07xx xxx xxx"></div>
+      </div>
+      <div class="fg"><label class="fl">Email</label><input class="fi2" type="email" id="am-email"></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Cotizație anuală (RON)</label><input class="fi2" type="number" id="am-cot" value="1200" placeholder="1200"></div>
+        <div class="fg"><label class="fl">An fiscal</label><select class="fi2" id="am-an"><option value="2026">2025-2026</option><option value="2025">2024-2025</option></select></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('m-addmem')">Anulează</button>
+      <button class="btn btn-rot" onclick="saveNewMember()">Adaugă</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="m-tranz">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title" id="m-tranz-title">Înregistrare</span><button class="modal-close" onclick="closeModal('m-tranz')">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="tranz-type">
+      <div class="frow">
+        <div class="fg"><label class="fl">Tip</label><select class="fi2" id="tranz-tip"><option value="intrare">▲ Intrare</option><option value="iesire">▼ Ieșire</option></select></div>
+        <div class="fg"><label class="fl">Data</label><input class="fi2" type="date" id="tranz-data"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Platitor / Beneficiar</label><input class="fi2" type="text" id="tranz-parte"></div>
+        <div class="fg"><label class="fl">Suma (RON)</label><input class="fi2" type="number" id="tranz-suma"></div>
+      </div>
+      <div class="fg"><label class="fl">Descriere</label><input class="fi2" type="text" id="tranz-desc"></div>
+    </div>
+    <div class="modal-foot" id="tranz-foot">
+      <button class="btn btn-outline" onclick="closeModal('m-tranz')">Anulează</button>
+      <button class="btn btn-rot" onclick="saveTranz()">Salvează</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="m-don">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title" id="m-don-title">Donație</span><button class="modal-close" onclick="closeModal('m-don')">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="don-eid">
+      <div class="frow">
+        <div class="fg"><label class="fl">Tip donator</label><select class="fi2" id="don-etp"><option value="membru">Membru club</option><option value="extern">Extern (non-membru)</option></select></div>
+        <div class="fg"><label class="fl">Data</label><input class="fi2" type="date" id="don-edata"></div>
+      </div>
+      <div class="fg"><label class="fl">Donator *</label><input class="fi2" type="text" id="don-enum" placeholder="Nume donator"></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Suma (RON) *</label><input class="fi2" type="number" id="don-esuma"></div>
+        <div class="fg"><label class="fl">Mod</label><select class="fi2" id="don-emod"><option>Cash</option><option>Transfer bancar</option><option>BT Pay</option><option>Altă metodă</option></select></div>
+      </div>
+      <div class="fg"><label class="fl">Scop / Descriere</label><input class="fi2" type="text" id="don-edesc" placeholder="ex: Donatie caritabila, Fond eveniment..."></div>
+    </div>
+    <div class="modal-foot" id="don-efoot">
+      <button class="btn btn-outline" onclick="closeModal('m-don')">Anulează</button>
+      <button class="btn btn-rot" onclick="saveDon()">Salvează</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="m-ri">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title">Plată Rotary Intl / District</span><button class="modal-close" onclick="closeModal('m-ri')">×</button></div>
+    <div class="modal-body">
+      <div class="fg"><label class="fl">Beneficiar</label>
+        <select class="fi2" id="ri-benef">
+          <option value="ri">Rotary International</option>
+          <option value="dist">District 2241</option>
+          <option value="alt">Alt beneficiar</option>
+        </select>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Suma (RON)</label><input class="fi2" type="number" id="ri-suma"></div>
+        <div class="fg"><label class="fl">Data</label><input class="fi2" type="date" id="ri-data"></div>
+      </div>
+      <div class="fg"><label class="fl">Referință / Descriere</label><input class="fi2" type="text" id="ri-desc" placeholder="ex: Cotizatie RI sem.II 2025-2026"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('m-ri')">Anulează</button>
+      <button class="btn btn-rot" onclick="saveRI()">Salvează</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="m-prot">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title" id="m-prot-title">Cheltuială protocol</span><button class="modal-close" onclick="closeModal('m-prot')">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="prot-eid">
+      <div class="frow">
+        <div class="fg"><label class="fl">Data</label><input class="fi2" type="date" id="prot-edata"></div>
+        <div class="fg"><label class="fl">Suma (RON) *</label><input class="fi2" type="number" id="prot-esuma"></div>
+      </div>
+      <div class="fg"><label class="fl">Eveniment / Descriere *</label><input class="fi2" type="text" id="prot-edesc" placeholder="ex: Agapă 27.11.2025 - Restaurant Aurora"></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Plătit de</label><input class="fi2" type="text" id="prot-eplatit" placeholder="ex: Henciu Andrei"></div>
+        <div class="fg"><label class="fl">Mod</label><select class="fi2" id="prot-emod"><option>Cash</option><option>Card</option><option>Transfer bancar</option><option>BT Pay</option></select></div>
+      </div>
+    </div>
+    <div class="modal-foot" id="prot-efoot">
+      <button class="btn btn-outline" onclick="closeModal('m-prot')">Anulează</button>
+      <button class="btn btn-rot" onclick="saveProt()">Salvează</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="m-fisa">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-hdr"><span class="modal-title">Fișă membru</span><button class="modal-close" onclick="closeModal('m-fisa')">×</button></div>
+    <div class="modal-body" id="m-fisa-body"></div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('m-fisa')">Închide</button>
+      <button class="btn btn-rot" onclick="printFisa()">🖨 Printează</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const VER='rotary-2.3.0';
+function saveState(){localStorage.setItem('rotary_data',JSON.stringify(S))}
+function loadState(){
+  const v=localStorage.getItem('rotary_ver');
+  if(v!==VER){localStorage.removeItem('rotary_data');localStorage.setItem('rotary_ver',VER)}
+  let s=null;
+  try{const d=localStorage.getItem('rotary_data');if(d)s=JSON.parse(d)}catch(e){}
+  if(!s)s=freshState();
+  if(!s.donatii)s.donatii=[];
+  if(!s.protocol)s.protocol=[];
+  if(!s.incasari2)s.incasari2=JSON.parse(JSON.stringify(INCASARI2_INIT));
+  if(!s.cheltuieli2)s.cheltuieli2=JSON.parse(JSON.stringify(CHELTUIELI2_INIT));
+  if(!s.riPayments)s.riPayments=[];
+  if(!s.chitNr)s.chitNr=1;
+  if(!s.m2025)s.m2025=JSON.parse(JSON.stringify(M2025_INIT));
+  if(!s.m2026)s.m2026=JSON.parse(JSON.stringify(M2026_INIT));
+  return s;
+}
+function freshState(){return{
+  membri:JSON.parse(JSON.stringify(MEMBRI_INIT)),
+  m2025:JSON.parse(JSON.stringify(M2025_INIT)),
+  m2026:JSON.parse(JSON.stringify(M2026_INIT)),
+  payments:[],
+  casa:JSON.parse(JSON.stringify(CASA_INIT)),
+  banca:JSON.parse(JSON.stringify(BANCA_INIT)),
+  donatii:JSON.parse(JSON.stringify(DONATII_INIT)),
+  protocol:JSON.parse(JSON.stringify(PROTOCOL_INIT)),
+  incasari2:JSON.parse(JSON.stringify(INCASARI2_INIT)),
+  cheltuieli2:JSON.parse(JSON.stringify(CHELTUIELI2_INIT)),
+  riPayments:JSON.parse(JSON.stringify(RI_INIT)),
+  chitNr:1
+}}
+
+// ===== DATE INITIALE =====
+const MEMBRI_INIT=[
+  {id:1,nume:'Lengyel Anita Larisa',rol:'Club President',rotaryId:'11483016',email:'anitaovidiu@yahoo.com',tel:'0742155667',ri2026:250,ri2026paid:true},
+  {id:2,nume:'Henciu Andrei',rol:'Club Secretary',rotaryId:'11483019',email:'henciua@yahoo.com',tel:'0744441607',ri2026:250,ri2026paid:false},
+  {id:3,nume:'Suciu Gyorfi Nicolae',rol:'Club Treasurer',rotaryId:'12500402',email:'suciugyorfinicolae@icloud.com',tel:'0731377793',ri2026:250,ri2026paid:true},
+  {id:4,nume:'Pasca Cristian Vasile',rol:'Club Vice President',rotaryId:'9858164',email:'cristian@lebada.ro',tel:'0742731151',scutit:true,obs:'Scutit — proprietar spatiu sedinte'},
+  {id:5,nume:'Steinbinder Ingrid',rol:'Club Executive Secretary',rotaryId:'11939959',email:'steinbinderi@gmail.com',tel:'0743695956',ri2026:250,ri2026paid:true},
+  {id:6,nume:'Henciu Oana Madalina',rol:'Club Foundation Chair',rotaryId:'11483665',email:'live4today23@yahoo.com',tel:'0755230230',ri2026:250,ri2026paid:false},
+  {id:7,nume:'Veres Gabriela Cornelia',rol:'Club Foundation Member',rotaryId:'12500651',email:'gabriela.veres@gmail.com',tel:'0758577578',ri2026:250,ri2026paid:false},
+  {id:8,nume:'Vonet Anca',rol:'Club Foundation Member',rotaryId:'12500716',email:'ancavonet@yahoo.com',tel:'0753020116',ri2026:250,ri2026paid:true},
+  {id:9,nume:'Bota Cosmin Gheorghe',rol:'Club Membership Chair',rotaryId:'11483663',email:'cosmin.bota@gmail.com',tel:'0723462077',ri2026:250,ri2026paid:true},
+  {id:10,nume:'Tuturas Bogdan Dumitru',rol:'Club Membership Member',rotaryId:'12161172',email:'tuturasbogdan@yahoo.com',tel:'0728557611',ri2026:250,ri2026paid:true},
+  {id:11,nume:'Suciu Gyorfi Daniela',rol:'Club Membership Member',rotaryId:'12500643',email:'danielasuciugyorfi@gmail.com',tel:'0722444522',ri2026:250,ri2026paid:true},
+  {id:12,nume:'Seucea Ramona Anca',rol:'Club Learning Facilitator Chair',rotaryId:'11483675',email:'anca_man@yahoo.com',tel:'0743046734',ri2026:250,ri2026paid:true},
+  {id:13,nume:'Havrincea Aurelia Dorina',rol:'Club Learning Facilitator',rotaryId:'12500628',email:'havrincea_aura@yahoo.com',tel:'0721770667',ri2026:250,ri2026paid:true},
+  {id:14,nume:'Chira Cristina',rol:'Club Learning Facilitator',rotaryId:'12500721',email:'drchiracristina@yahoo.ro',tel:'0742911248',ri2026:250,ri2026paid:true},
+  {id:15,nume:'Deac Vlad Birtoc',rol:'Club Public Image Chair',rotaryId:'12500724',email:'deacvlad7@gmail.com',tel:'0740150894',ri2026:250,ri2026paid:true},
+  {id:16,nume:'Deac Kaiser Stefanie Brigitte',rol:'Club Public Image Member',rotaryId:'12500723',email:'stefaniebrigittekaiser@gmail.com',tel:'0745286194',ri2026:250,ri2026paid:true},
+  {id:17,nume:'Haisiuc Raluca Maria',rol:'Club Service Projects Chair',rotaryId:'11483668',email:'raluca.maria.trif@gmail.com',tel:'0743862911',ri2026:250,ri2026paid:true},
+  {id:18,nume:'Cheregi Roxana Doris',rol:'Club Service Projects Member',rotaryId:'12500718',email:'roxydorischeregi@gmail.com',tel:'0724601512',ri2026:250,ri2026paid:false},
+  {id:19,nume:'Lazarescu Adina Maria',rol:'Club Service Projects Member',rotaryId:'12500629',email:'adina.lzr@gmail.com',tel:'0744224398',ri2026:250,ri2026paid:true},
+  {id:20,nume:'Lengyel Ovidiu Sebastian',rol:'Club Member',rotaryId:'12500633',email:'ovidiuanita@yahoo.com',tel:'0740968675',ri2026:250,ri2026paid:true},
+];
+const M2025_INIT=[
+  {memId:1,an:'2025',cotizatieAn:200,incasat:200,rest:0},
+  {memId:2,an:'2025',cotizatieAn:200,incasat:200,rest:0},
+  {memId:3,an:'2025',cotizatieAn:200,incasat:200,rest:0},
+  {memId:4,an:'2025',cotizatieAn:0,incasat:0,rest:0,scutit:true},
+  {memId:5,an:'2025',cotizatieAn:200,incasat:200,rest:0},
+  {memId:6,an:'2025',cotizatieAn:200,incasat:200,rest:0},
+  {memId:7,an:'2025',cotizatieAn:200,incasat:0,rest:200},
+  {memId:8,an:'2025',cotizatieAn:200,incasat:200,rest:0},
+  {memId:9,an:'2025',cotizatieAn:200,incasat:200,rest:0},
+  {memId:10,an:'2025',cotizatieAn:200,incasat:200,rest:0},
+  {memId:11,an:'2025',cotizatieAn:200,incasat:200,rest:0},
+  {memId:12,an:'2025',cotizatieAn:200,incasat:200,rest:0},
+  {memId:13,an:'2025',cotizatieAn:200,incasat:200,rest:0},
+  {memId:14,an:'2025',cotizatieAn:200,incasat:200,rest:0},
+  {memId:15,an:'2025',cotizatieAn:200,incasat:200,rest:0},
+  {memId:16,an:'2025',cotizatieAn:200,incasat:200,rest:0},
+  {memId:17,an:'2025',cotizatieAn:200,incasat:200,rest:0},
+  {memId:18,an:'2025',cotizatieAn:200,incasat:200,rest:0},
+  {memId:19,an:'2025',cotizatieAn:200,incasat:200,rest:0},
+  {memId:20,an:'2025',cotizatieAn:200,incasat:200,rest:0},
+];
+const M2026_INIT=[
+  {memId:1,an:'2026',cotizatieAn:600,incasat:200,rest:400},
+  {memId:2,an:'2026',cotizatieAn:600,incasat:200,rest:400},
+  {memId:3,an:'2026',cotizatieAn:600,incasat:200,rest:400},
+  {memId:4,an:'2026',cotizatieAn:0,incasat:0,rest:0,scutit:true},
+  {memId:5,an:'2026',cotizatieAn:600,incasat:300,rest:300},
+  {memId:6,an:'2026',cotizatieAn:600,incasat:200,rest:400},
+  {memId:7,an:'2026',cotizatieAn:600,incasat:0,rest:600},
+  {memId:8,an:'2026',cotizatieAn:600,incasat:100,rest:500},
+  {memId:9,an:'2026',cotizatieAn:600,incasat:100,rest:500},
+  {memId:10,an:'2026',cotizatieAn:600,incasat:100,rest:500},
+  {memId:11,an:'2026',cotizatieAn:600,incasat:200,rest:400},
+  {memId:12,an:'2026',cotizatieAn:600,incasat:300,rest:300},
+  {memId:13,an:'2026',cotizatieAn:600,incasat:200,rest:400},
+  {memId:14,an:'2026',cotizatieAn:600,incasat:100,rest:500},
+  {memId:15,an:'2026',cotizatieAn:600,incasat:650,rest:0},
+  {memId:16,an:'2026',cotizatieAn:600,incasat:650,rest:0},
+  {memId:17,an:'2026',cotizatieAn:600,incasat:100,rest:500},
+  {memId:18,an:'2026',cotizatieAn:600,incasat:0,rest:600},
+  {memId:19,an:'2026',cotizatieAn:600,incasat:300,rest:300},
+  {memId:20,an:'2026',cotizatieAn:600,incasat:200,rest:400},
+];
+const CASA_INIT=[
+  {id:'c_i1',tip:'intrare',parte:'Membri fondatori',data:'29.08.2025',suma:380,desc:'Donatie fondare club'},
+  {id:'c_i2',tip:'intrare',parte:'Membri - sedinta 27.11.2025',data:'27.11.2025',suma:2600,desc:'Incasare cotizatii sedinta (BT Pay)'},
+  {id:'c_i3',tip:'intrare',parte:'Membri - sedinta 15.01.2026',data:'15.01.2026',suma:3000,desc:'Incasare cotizatii sedinta'},
+  {id:'c_i4',tip:'intrare',parte:'Membri - sedinta 29.01.2026',data:'29.01.2026',suma:1250,desc:'Incasare cotizatii sedinta'},
+  {id:'c_i5',tip:'intrare',parte:'Membri - sedinta 12.02.2026',data:'12.02.2026',suma:1650,desc:'Incasare cotizatii sedinta (BTPay)'},
+  {id:'c_i6',tip:'intrare',parte:'Membri - sedinta 26.02.2026',data:'26.02.2026',suma:1050,desc:'Incasare cotizatii sedinta'},
+  {id:'c_i7',tip:'intrare',parte:'Membri - sedinta 05.03.2026',data:'05.03.2026',suma:600,desc:'Incasare cotizatii sedinta (BTPay)'},
+  {id:'c_i8',tip:'intrare',parte:'Membri - sedinta 28.03.2026',data:'28.03.2026',suma:1300,desc:'Incasare cotizatii sedinta'},
+  {id:'c_e1',tip:'iesire',parte:'Restaurant Aurora',data:'27.11.2025',suma:1003,desc:'Agapa R.Aurora 27.11.2025'},
+  {id:'c_e2',tip:'iesire',parte:'Asoc. Rotary Ind. Distr.2241',data:'20.01.2026',suma:600,desc:'Cotizatie District 2241'},
+  {id:'c_e3',tip:'iesire',parte:'Rotary Lion Bucuresti',data:'29.01.2026',suma:1000,desc:'Eveniment caritabil (prin Andrei H.)'},
+  {id:'c_e4',tip:'iesire',parte:'Rotary International',data:'30.01.2026',suma:4372,desc:'Cotizatie RI 850 EUR sem.I 2025-2026'},
+  {id:'c_e5',tip:'iesire',parte:'Fanioane personalizate',data:'12.02.2026',suma:405,desc:'10 buc (prin Andrei H.)'},
+  {id:'c_e6',tip:'iesire',parte:'RC Galati / PELS Cluj Napoca',data:'16.03.2026',suma:2900,desc:'Fam. Henciu'},
+  {id:'c_e7',tip:'iesire',parte:'Ana Tanasie',data:'24.03.2026',suma:1036,desc:'Prin Andrei H.'},
+  {id:'c_e8',tip:'iesire',parte:'Andrei Henciu',data:'28.03.2026',suma:64,desc:'Sume la Andrei'},
+];
+const BANCA_INIT=[];
+const DONATII_INIT=[
+  {id:'d1',tip:'membru',donator:'Membri fondatori',data:'29.08.2025',suma:380,mod:'Cash',desc:'Donatie membrii la sedinta fondare'},
+];
+const PROTOCOL_INIT=[
+  {id:'p1',desc:'Agapa Restaurant Aurora',data:'27.11.2025',suma:1003,platit:'',mod:'Transfer bancar'},
+  {id:'p2',desc:'Eveniment caritabil Rotary Lion Bucuresti',data:'29.01.2026',suma:1000,platit:'Henciu Andrei',mod:'Cash'},
+  {id:'p3',desc:'Fanioane personalizate 10 buc',data:'12.02.2026',suma:405,platit:'Henciu Andrei',mod:'Cash'},
+  {id:'p4',desc:'RC Galati Donaris / PELS Cluj Napoca fam. Henciu',data:'16.03.2026',suma:2900,platit:'Henciu Andrei',mod:'Transfer bancar'},
+  {id:'p5',desc:'Plata Ana Tanasie',data:'24.03.2026',suma:1036,platit:'Henciu Andrei',mod:'Transfer bancar'},
+  {id:'p6',desc:'Sume la Andrei Henciu',data:'28.03.2026',suma:64,platit:'Henciu Andrei',mod:'Cash'},
+];
+const INCASARI2_INIT=[
+  {id:'ii1',data:'29.08.2025',parte:'Membri fondatori',suma:380,mod:'Cash',desc:'Donatie fondare club'},
+  {id:'ii2',data:'27.11.2025',parte:'Membri - sedinta 27.11.2025',suma:2600,mod:'BT Pay',desc:'Cotizatii sedinta'},
+  {id:'ii3',data:'15.01.2026',parte:'Membri - sedinta 15.01.2026',suma:3000,mod:'BT Pay',desc:'Cotizatii sedinta'},
+  {id:'ii4',data:'29.01.2026',parte:'Membri - sedinta 29.01.2026',suma:1250,mod:'BT Pay',desc:'Cotizatii sedinta'},
+  {id:'ii5',data:'12.02.2026',parte:'Membri - sedinta 12.02.2026',suma:1650,mod:'BT Pay',desc:'Cotizatii sedinta'},
+  {id:'ii6',data:'26.02.2026',parte:'Membri - sedinta 26.02.2026',suma:1050,mod:'BT Pay',desc:'Cotizatii sedinta'},
+  {id:'ii7',data:'05.03.2026',parte:'Membri - sedinta 05.03.2026',suma:600,mod:'BT Pay',desc:'Cotizatii sedinta'},
+  {id:'ii8',data:'28.03.2026',parte:'Membri - sedinta 28.03.2026',suma:1300,mod:'BT Pay',desc:'Cotizatii sedinta'},
+];
+const CHELTUIELI2_INIT=[
+  {id:'ci1',data:'27.11.2025',parte:'Restaurant Aurora',suma:1003,mod:'Transfer bancar',desc:'Agapa R.Aurora 27.11.2025'},
+  {id:'ci2',data:'20.01.2026',parte:'Asoc. Rotary Ind. Distr.2241',suma:600,mod:'Transfer bancar',desc:'Cotizatie District 2241'},
+  {id:'ci3',data:'29.01.2026',parte:'Rotary Lion Bucuresti',suma:1000,mod:'Cash',desc:'Eveniment caritabil (prin Andrei H.)'},
+  {id:'ci4',data:'30.01.2026',parte:'Rotary International',suma:4372,mod:'Transfer bancar',desc:'Cotizatie RI 850 EUR sem.I'},
+  {id:'ci5',data:'12.02.2026',parte:'Fanioane personalizate',suma:405,mod:'Cash',desc:'10 buc (prin Andrei H.)'},
+  {id:'ci6',data:'16.03.2026',parte:'RC Galati / PELS Cluj Napoca',suma:2900,mod:'Transfer bancar',desc:'Fam. Henciu'},
+  {id:'ci7',data:'24.03.2026',parte:'Ana Tanasie',suma:1036,mod:'Transfer bancar',desc:'Prin Andrei H.'},
+  {id:'ci8',data:'28.03.2026',parte:'Andrei Henciu',suma:64,mod:'Cash',desc:'Sume la Andrei'},
+];
+const RI_INIT=[
+  {id:'ri1',benef:'District 2241',suma:600,data:'20.01.2026',desc:'Cotizatie District 2241 sem.I 2025-2026'},
+  {id:'ri2',benef:'Rotary International',suma:4372,data:'30.01.2026',desc:'Cotizatie Rotary International 850 EUR sem.I 2025-2026'},
+];
+
+let S=loadState();
+let cotF='all';
+let editingId=null;
+let _saving=false;
+
+const fmt=n=>Number(n||0).toLocaleString('ro-RO');
+const today=()=>new Date().toISOString().split('T')[0];
+const dd2iso=s=>{if(!s)return'';const p=s.split('.');return p.length===3?p[2]+'-'+p[1]+'-'+p[0]:s};
+const iso2dd=s=>{if(!s)return'';const p=s.split('-');return p.length===3?p[2]+'.'+p[1]+'.'+p[0]:s};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2);
+const calcSold=arr=>arr.reduce((s,r)=>r.tip==='intrare'?s+r.suma:s-r.suma,0);
+const sortByDate=arr=>[...arr].sort((a,b)=>{
+  const p=s=>{const q=(s||'').split('.');return q.length===3?q[2]+q[1]+q[0]:s||''};
+  return p(a.data).localeCompare(p(b.data))
+});
+const filterByMonth=(arr,luna)=>{
+  if(!luna)return arr;
+  return arr.filter(r=>{if(!r.data)return false;const p=r.data.split('.');return p.length>=3&&p[2]+'-'+p[1]===luna});
+};
+const status=m=>m.scutit?'paid':m.incasat>=m.cotizatieAn&&m.cotizatieAn>0?'paid':m.incasat>0?'partial':'unpaid';
+function getAnData(an){
+  if(an==='2025')return S.m2025.map(d=>{const m=S.membri.find(x=>x.id===d.memId)||{};return{...m,...d}});
+  if(an==='2026')return S.m2026.map(d=>{const m=S.membri.find(x=>x.id===d.memId)||{};return{...m,...d}});
+  // all - combined view
+  return S.membri.map(m=>{
+    const d25=S.m2025.find(x=>x.memId===m.id)||{cotizatieAn:0,incasat:0,rest:0};
+    const d26=S.m2026.find(x=>x.memId===m.id)||{cotizatieAn:0,incasat:0,rest:0};
+    return{...m,cotizatieAn:d25.cotizatieAn+d26.cotizatieAn,incasat:d25.incasat+d26.incasat,rest:d25.rest+d26.rest};
+  });
+}
+function getCurAn(){return document.getElementById('cot-an')?document.getElementById('cot-an').value:'2026';}
+
+const TITLES={cotizatii:'Cotizații membri',donatii:'Donații',casa:'Registru casă',banca:'Jurnal bancă',donatii:'Donații',rotary_int:'Rotary International & District',protocol:'Protocol & Evenimente',rapoarte:'Rapoarte'};
+const SUBS={cotizatii:'100 RON/lună per membru · An fiscal 2025-2026',donatii:'Donații membri și externi',casa:'Înregistrări numerar · sold curent',banca:'Tranzacții cont bancă · sold curent',donatii:'Donații membri și externi',rotary_int:'Plăți cotizații internaționale și district',protocol:'Cheltuieli protocol și organizare evenimente',rapoarte:'Situație generală financiară'};
+
+function nav(name,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  const panel=document.getElementById('p-'+name);
+  if(panel)panel.classList.add('active');
+  document.querySelectorAll('.ni').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const ttel=document.getElementById('tb-title');if(ttel)ttel.textContent=TITLES[name]||'';
+  const tsel=document.getElementById('tb-sub');if(tsel)tsel.textContent=SUBS[name]||'';
+  if(name==='cotizatii'){renderCotMetrics();renderCot()}
+  if(name==='cot2025')renderCot2('2025');
+  if(name==='cot2026')renderCot2('2026');
+  if(name==='incasari'){if(!S.incasari2)S.incasari2=JSON.parse(JSON.stringify(INCASARI2_INIT));renderInc2();}
+  if(name==='cheltuieli'){if(!S.cheltuieli2)S.cheltuieli2=JSON.parse(JSON.stringify(CHELTUIELI2_INIT));renderChelt();}
+  if(name==='donatii'){renderDon()}
+  if(name==='casa')renderCasa();
+  if(name==='banca')renderBanca();
+  if(name==='rotary_int'){renderRI()}
+  if(name==='protocol'){renderProt()}
+  if(name==='rapoarte'){renderRapoarte()}
+}
+function itab(g,n,btn){
+  document.querySelectorAll('#p-'+g+' .itab, #p-casa .itab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#fin-casa, #fin-banca').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('fin-'+n).classList.add('active');
+}
+function setF(f,btn){cotF=f;document.querySelectorAll('.fb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderCot()}
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+document.addEventListener('click',e=>{if(e.target.classList.contains('overlay'))e.target.classList.remove('open')});
+
+// COTIZATII
+function renderCotMetrics(){
+  const an=getCurAn();
+  const m=getAnData(an);
+  const td=m.reduce((s,x)=>s+(x.cotizatieAn||0),0);
+  const ti=m.reduce((s,x)=>s+(x.incasat||0),0);
+  const tr=m.reduce((s,x)=>s+Math.max(0,(x.cotizatieAn||0)-(x.incasat||0)),0);
+  const na=m.filter(x=>status(x)==='paid').length;
+  const nu=m.filter(x=>status(x)==='unpaid').length;
+  const anLabel=an==='2025'?'Nov–Dec 2025':an==='2026'?'Ian–Iun 2026':'Total 2025+2026';
+  document.getElementById('cot-metrics').innerHTML=`
+    <div class="metric"><div class="metric-label">An fiscal</div><div class="metric-val mv-b" style="font-size:16px">${anLabel}</div></div>
+    <div class="metric"><div class="metric-label">Total datorat</div><div class="metric-val mv-b">${fmt(td)} RON</div></div>
+    <div class="metric"><div class="metric-label">Total încasat</div><div class="metric-val mv-g">${fmt(ti)} RON</div></div>
+    <div class="metric"><div class="metric-label">Rest</div><div class="metric-val mv-r">${fmt(tr)} RON</div></div>
+    <div class="metric"><div class="metric-label">Achitați</div><div class="metric-val mv-g">${na}</div></div>
+    <div class="metric"><div class="metric-label">Restanțieri</div><div class="metric-val mv-r">${nu}</div></div>`;
+}
+function renderCot(){
+  const q=(document.getElementById('cot-q').value||'').toLowerCase();
+  const an=getCurAn();
+  let list=getAnData(an);
+  if(q)list=list.filter(m=>m.nume.toLowerCase().includes(q)||( m.rol||'').toLowerCase().includes(q));
+  if(cotF==='paid')list=list.filter(m=>status(m)==='paid');
+  if(cotF==='partial')list=list.filter(m=>status(m)==='partial');
+  if(cotF==='unpaid')list=list.filter(m=>status(m)==='unpaid');
+  const tb=document.getElementById('cot-tbody');
+  tb.innerHTML=list.map(m=>{
+    const st=status(m);
+    const bc=m.scutit?'bg-blue':st==='paid'?'bg-green':st==='partial'?'bg-amber':'bg-red';
+    const bt=m.scutit?'Scutit ✓':st==='paid'?'Achitat':st==='partial'?'Parțial':'Restant';
+    const rest=Math.max(0,m.cotizatieAn-(m.incasat||0));
+    const pays=S.payments.filter(p=>p.memId===m.id);
+    const lastPay=pays.length?pays[pays.length-1]:null;
+    return '<tr>'
+      +'<td style="font-size:12px;color:var(--text3)">'+( m.rol||'—')+'</td>'
+      +'<td><b>'+m.nume+'</b></td>'
+      +'<td style="font-size:12px">'+( m.rotaryId||'—')+'</td>'
+      +'<td>'+fmt(m.cotizatieAn)+' RON</td>'
+      +'<td style="color:var(--green);font-weight:500">'+fmt(m.incasat||0)+' RON</td>'
+      +'<td style="color:'+(rest>0?'var(--red)':'var(--green)')+';font-weight:500">'+(rest>0?fmt(rest)+' RON':'—')+'</td>'
+      +'<td style="font-size:12px">'+(lastPay?lastPay.data+' · '+lastPay.suma+' RON':'—')+'</td>'
+      +'<td><span class="badge '+bc+'">'+bt+'</span></td>'
+      +'<td class="td-actions">'
+      +'<button class="btn btn-outline btn-xs" onclick="showFisa('+m.id+')">Fișă</button>'
+      +'</td></tr>';
+  }).join('')||'<tr><td colspan="9" class="empty"><div>Niciun rezultat</div></td></tr>';
+}
+function fillIncasareSelect(){
+  const an=getCurAn()==='all'?'2026':getCurAn();
+  const anData=getAnData(an);
+  const sel=document.getElementById('inc-mem');
+  sel.innerHTML='<option value="">— alege membrul —</option>';
+  S.membri.forEach(m=>{
+    const md=anData.find(x=>x.memId===m.id||x.id===m.id)||m;
+    const rest=Math.max(0,(md.cotizatieAn||0)-(md.incasat||0));
+    const o=document.createElement('option');
+    o.value=m.id;
+    o.text=m.nume+(rest>0?' — rest: '+fmt(rest)+' RON':m.scutit?' ✓ scutit':' ✓ achitat');
+    if(rest<=0)o.style='color:#888';
+    sel.appendChild(o);
+  });
+  sel.onchange=function(){
+    const m=S.membri.find(x=>x.id==this.value);
+    const an2=getCurAn()==='all'?'2026':getCurAn();
+    const anD=getAnData(an2);
+    const warn=document.getElementById('inc-warn');
+    if(m){
+      const md=anD.find(x=>x.memId===m.id||x.id===m.id)||m;
+      const rest=Math.max(0,(md.cotizatieAn||0)-(md.incasat||0));
+      if(rest<=0){
+        warn.innerHTML='<div style="background:#FFF3CD;border:1px solid #E9A400;border-radius:6px;padding:6px 10px;font-size:12px;color:#854F0B">⚠️ Acest membru este deja achitat integral!</div>';
+      }else{
+        warn.innerHTML='<div style="background:#D8F3DC;border:1px solid #2D6A4F;border-radius:6px;padding:6px 10px;font-size:12px;color:#2D6A4F">Rest de plată: <b>'+fmt(rest)+' RON</b></div>';
+      }
+    }else warn.innerHTML='';
+  };
+}
+function openIncasareModal(){
+  fillIncasareSelect();
+  document.getElementById('inc-suma').value='';
+  document.getElementById('inc-data').value=today();
+  document.getElementById('inc-obs').value='';
+  document.getElementById('inc-luni').value='';
+  document.getElementById('inc-warn').innerHTML='';
+  openModal('m-incasare');
+}
+function saveIncasare(){
+  if(_saving)return;_saving=true;
+  setTimeout(()=>{
+    try{
+      const memId=parseInt(document.getElementById('inc-mem').value);
+      const suma=parseFloat(document.getElementById('inc-suma').value);
+      const dataRaw=document.getElementById('inc-data').value;
+      const mod=document.getElementById('inc-mod').value;
+      const obs=document.getElementById('inc-obs').value;
+      const luni=document.getElementById('inc-luni').value;
+      if(!memId){alert('Selectează membrul.');return}
+      if(!suma||isNaN(suma)||suma<=0){alert('Completează suma.');return}
+      if(!dataRaw){alert('Completează data.');return}
+      const m=S.membri.find(x=>x.id===memId);
+      if(!m){alert('Membrul nu a fost găsit.');return}
+      const data=iso2dd(dataRaw);
+      document.getElementById('inc-mem').value='';
+      document.getElementById('inc-suma').value='';
+      // Update correct year data
+      const anSel=getCurAn()==='all'?'2026':getCurAn();
+      const anData=anSel==='2025'?S.m2025:S.m2026;
+      const mAnData=anData.find(x=>x.memId===memId);
+      if(mAnData){mAnData.incasat=(mAnData.incasat||0)+suma;mAnData.rest=mAnData.scutit?0:Math.max(0,mAnData.cotizatieAn-mAnData.incasat);}
+      const pid=uid();
+      S.payments.push({id:pid,memId,an:anSel,suma,data,mod,obs,luni});
+      // Toate platile prin casa (nu avem cont bancar inca)
+      const desc='Cotizatie RC SM Cetate — '+m.nume+(luni?' ('+luni+')':'');
+      S.casa.push({id:'sync_'+pid,tip:'intrare',parte:m.nume,data,suma,desc});
+      const nr=S.chitNr++;
+      saveState();
+      closeModal('m-incasare');
+      // Build chitanta
+      const rest=Math.max(0,m.cotizatieAn-m.incasat);
+      const chtml='<div style="border:1.5px solid var(--rot);border-radius:12px;padding:22px 26px">'
+        +'<div style="font-family:Crimson Pro,serif;font-size:18px;text-align:center;margin-bottom:3px">CHITANȚĂ Nr. '+nr+'</div>'
+        +'<div style="font-size:11px;text-align:center;color:var(--text3);margin-bottom:14px">Rotary Club Satu Mare Cetate</div>'
+        +'<table style="width:100%;font-size:13px;border-collapse:collapse">'
+        +'<tr><td style="color:var(--text3);padding:4px 0">De la</td><td style="font-weight:500;text-align:right">'+m.nume+'</td></tr>'
+        +'<tr style="border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr)"><td style="padding:7px 0;font-size:15px">Suma achitată</td><td style="font-weight:600;font-size:18px;color:var(--green);text-align:right">+'+fmt(suma)+' RON</td></tr>'
+        +'<tr><td style="color:var(--text3);padding:4px 0">Data</td><td style="font-weight:500;text-align:right">'+data+'</td></tr>'
+        +'<tr><td style="color:var(--text3);padding:4px 0">Mod plată</td><td style="font-weight:500;text-align:right">'+mod+'</td></tr>'
+        +(luni?'<tr><td style="color:var(--text3);padding:4px 0">Luni acoperite</td><td style="font-weight:500;text-align:right">'+luni+'</td></tr>':'')
+        +'<tr><td style="color:var(--text3);padding:4px 0">Cotizație anuală</td><td style="font-weight:500;text-align:right">'+fmt(m.cotizatieAn)+' RON</td></tr>'
+        +'<tr><td style="color:var(--text3);padding:4px 0">Total încasat</td><td style="font-weight:500;text-align:right">'+fmt(m.incasat)+' RON</td></tr>'
+        +'<tr style="border-top:2px solid var(--rot)"><td style="font-weight:600;padding:7px 0">Sold rămas</td><td style="font-weight:600;text-align:right;color:'+(rest>0?'var(--red)':'var(--green)')+'">'+( rest>0?fmt(rest)+' RON':'Achitat integral ✓')+'</td></tr>'
+        +(obs?'<tr><td style="color:var(--text3)">Obs.</td><td style="text-align:right">'+obs+'</td></tr>':'')
+        +'</table>'
+        +'<div style="text-align:right;font-size:11px;color:var(--text3);margin-top:12px">Trezorier: Suciu Gyorfi Nicolae · '+new Date().toLocaleDateString('ro-RO')+'</div>'
+        +'</div>';
+      document.getElementById('m-chitanta-body').innerHTML=chtml;
+      openModal('m-chitanta');
+      renderCot();renderCotMetrics();
+    }finally{_saving=false}
+  },50);
+}
+function printChitanta(){
+  document.getElementById('print-area').innerHTML=document.getElementById('m-chitanta-body').innerHTML;
+  window.print();setTimeout(()=>document.getElementById('print-area').innerHTML='',1000);
+}
+function showFisa(id){
+  const m=S.membri.find(x=>x.id===id);if(!m)return;
+  const pays=S.payments.filter(p=>p.memId===id);
+  const d25=S.m2025.find(x=>x.memId===id)||{cotizatieAn:0,incasat:0,rest:0};
+  const d26=S.m2026.find(x=>x.memId===id)||{cotizatieAn:0,incasat:0,rest:0};
+  const totalDatorat=d25.cotizatieAn+d26.cotizatieAn;
+  const totalIncasat=d25.incasat+d26.incasat;
+  const totalRest=d25.rest+d26.rest;
+  const st=m.scutit?'paid':totalRest<=0&&totalDatorat>0?'paid':totalIncasat>0?'partial':'unpaid';
+  const bc=st==='paid'?'color:var(--green)':st==='partial'?'color:var(--amber)':'color:var(--red)';
+  const bt=m.scutit?'Scutit ✓':st==='paid'?'Achitat integral':st==='partial'?'Parțial achitat':'Restant';
+  let html='<div style="text-align:center;padding:14px 0 12px;border-bottom:2px solid var(--rot);margin-bottom:14px">'
+    +'<div style="font-family:Crimson Pro,serif;font-size:20px;font-weight:600;color:var(--rot)">'+m.nume+'</div>'
+    +'<div style="font-size:12px;color:var(--text3);margin-top:3px">'+m.rol+'</div>'
+    +'<div style="font-size:12px;color:var(--text3)">ID Rotary: '+m.rotaryId+' · '+m.tel+'</div>'
+    +'</div>'
+    // Per year breakdown
+    +'<div style="font-size:12px;font-weight:600;color:var(--rot);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Situație cotizații</div>'
+    +'<table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:14px">'
+    +'<tr style="background:var(--bg2)"><th style="padding:6px 8px;text-align:left;color:var(--text3)">Perioadă</th><th style="padding:6px 8px;text-align:right;color:var(--text3)">De plătit</th><th style="padding:6px 8px;text-align:right;color:var(--text3)">Încasat</th><th style="padding:6px 8px;text-align:right;color:var(--text3)">Rest</th><th style="padding:6px 8px;text-align:center;color:var(--text3)">Status</th></tr>'
+    +(m.scutit?'<tr><td colspan="5" style="padding:8px;text-align:center;color:var(--rot)">Scutit de cotizație ✓</td></tr>':(
+      (d25.cotizatieAn>0?'<tr style="border-bottom:1px solid var(--bdr)"><td style="padding:6px 8px;font-weight:500">Nov–Dec 2025</td><td style="padding:6px 8px;text-align:right">'+fmt(d25.cotizatieAn)+' RON</td><td style="padding:6px 8px;text-align:right;color:var(--green)">'+fmt(d25.incasat)+' RON</td><td style="padding:6px 8px;text-align:right;color:'+(d25.rest>0?'var(--red)':'var(--green)')+'">'+( d25.rest>0?fmt(d25.rest)+' RON':'—')+'</td><td style="padding:6px 8px;text-align:center"><span class="badge '+(d25.rest<=0?'bg-green':'bg-red')+'">'+(d25.rest<=0?'✓ Achitat':'Restant')+'</span></td></tr>':'')
+      +(d26.cotizatieAn>0?'<tr><td style="padding:6px 8px;font-weight:500">Ian–Iun 2026</td><td style="padding:6px 8px;text-align:right">'+fmt(d26.cotizatieAn)+' RON</td><td style="padding:6px 8px;text-align:right;color:var(--green)">'+fmt(d26.incasat)+' RON</td><td style="padding:6px 8px;text-align:right;color:'+(d26.rest>0?'var(--red)':'var(--green)')+'">'+( d26.rest>0?fmt(d26.rest)+' RON':'—')+'</td><td style="padding:6px 8px;text-align:center"><span class="badge '+(d26.rest<=0?'bg-green':'bg-amber')+'">'+(d26.rest<=0?'✓ Achitat':d26.incasat>0?'Parțial':'Restant')+'</span></td></tr>':'')
+      +'<tr style="border-top:2px solid var(--rot)"><td style="padding:6px 8px;font-weight:600">TOTAL</td><td style="padding:6px 8px;text-align:right;font-weight:600">'+fmt(totalDatorat)+' RON</td><td style="padding:6px 8px;text-align:right;font-weight:600;color:var(--green)">'+fmt(totalIncasat)+' RON</td><td style="padding:6px 8px;text-align:right;font-weight:600;color:'+(totalRest>0?'var(--red)':'var(--green)')+'">'+( totalRest>0?fmt(totalRest)+' RON':'—')+'</td><td style="padding:6px 8px;text-align:center"><span class="badge '+( totalRest<=0?'bg-green':'bg-amber')+'">'+bt+'</span></td></tr>'
+    ))
+    +'</table>';
+  if(pays.length){
+    html+='<div style="font-size:12px;font-weight:600;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Plăți înregistrate</div>';
+    pays.forEach(p=>{
+      html+='<div style="display:flex;justify-content:space-between;padding:6px 8px;border-bottom:1px solid var(--bdr);font-size:13px">'
+        +'<div><span style="font-weight:500">'+p.data+'</span> <span style="color:var(--text3)">· '+p.mod+(p.luni?' · '+p.luni:'')+(p.obs?' · '+p.obs:'')+'</span></div>'
+        +'<span style="color:var(--green);font-weight:600">+'+fmt(p.suma)+' RON</span></div>';
+    });
+    html+='<div style="display:flex;justify-content:space-between;padding:6px 8px;font-weight:600;border-top:2px solid var(--rot);font-size:13px"><span>Total plăți</span><span style="color:var(--green)">'+fmt(pays.reduce((s,p)=>s+p.suma,0))+' RON</span></div>';
+  }
+  // SECTIUNE RI 250 RON
+  if(!m.scutit){
+    const riPaid=m.ri2026paid||false;
+    html+='<div style="margin-bottom:14px;background:'+(riPaid?'#D8F3DC':'#FDECEA')+';border:1px solid '+(riPaid?'#2D6A4F':'#9B2335')+';border-radius:8px;padding:12px 14px">'
+      +'<div style="font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Cotizație Rotary International · Sem. II 2025-2026</div>'
+      +'<div style="display:flex;justify-content:space-between;align-items:center">'
+      +'<div>'
+      +'<div style="font-size:15px;font-weight:600">250 RON</div>'
+      +'<div style="font-size:12px;color:var(--text3);margin-top:2px">500 RON/an · 2 rate × 250 RON · Termen: 30 iunie 2026</div>'
+      +'</div>'
+      +'<div style="text-align:right">'
+      +'<div style="font-size:14px;font-weight:600;color:'+(riPaid?'#2D6A4F':'#9B2335')+'">'+(riPaid?'✓ Achitat':'✗ Neachitat')+'</div>'
+      +'<button class="btn btn-xs" style="margin-top:6px;background:'+(riPaid?'#eee':'#003F87')+';color:'+(riPaid?'#333':'white')+';border:none" onclick="toggleRI('+m.id+')">'+( riPaid?'Marchează neachitat':'Marchează achitat')+'</button>'
+      +'</div>'
+      +'</div>'
+      +'</div>';
+  }
+  html+='<div style="text-align:right;font-size:11px;color:var(--text3);margin-top:10px;padding-top:8px;border-top:1px solid var(--bdr)">Trezorier: Suciu Gyorfi Nicolae · RC Satu Mare Cetate</div>';
+  document.getElementById('m-fisa-body').innerHTML=html;
+  openModal('m-fisa');
+}
+function printFisa(){
+  const area=document.getElementById('print-area');
+  area.innerHTML='<div style="font-family:Crimson Pro,serif;font-size:18px;font-weight:600;margin-bottom:10px">Rotary Club Satu Mare Cetate — Fișă Membru</div>'+document.getElementById('m-fisa-body').innerHTML;
+  area.querySelectorAll('button').forEach(b=>b.remove());
+  window.print();setTimeout(()=>area.innerHTML='',1000);
+}
+function saveNewMember(){
+  const nume=document.getElementById('am-nume').value.trim();
+  const rotaryId=document.getElementById('am-id').value.trim();
+  const rol=document.getElementById('am-rol').value.trim();
+  const tel=document.getElementById('am-tel').value.trim();
+  const email=document.getElementById('am-email').value.trim();
+  const cotizatieAn=parseFloat(document.getElementById('am-cot').value)||1200;
+  const an=document.getElementById('am-an').value;
+  if(!nume){alert('Completează numele.');return}
+  S.membri.push({id:Math.max(0,...S.membri.map(m=>m.id))+1,nume,rol,rotaryId,email,tel,cotizatieAn,incasat:0,an});
+  saveState();closeModal('m-addmem');renderCot();renderCotMetrics();
+  alert('Membrul '+nume+' a fost adăugat!');
+}
+function openAddMemModal(){
+  ['am-nume','am-id','am-rol','am-tel','am-email'].forEach(x=>document.getElementById(x).value='');
+  document.getElementById('am-cot').value='1200';
+  openModal('m-addmem');
+}
+
+// DONATII
+function renderDon(){
+  const q=(document.getElementById('don-q').value||'').toLowerCase();
+  const tipF=document.getElementById('don-tip-f').value;
+  let arr=sortByDate(S.donatii);
+  if(q)arr=arr.filter(d=>(d.donator||'').toLowerCase().includes(q)||(d.desc||'').toLowerCase().includes(q));
+  if(tipF!=='all')arr=arr.filter(d=>d.tip===tipF);
+  const total=S.donatii.reduce((s,d)=>s+d.suma,0);
+  const membri=S.donatii.filter(d=>d.tip==='membru').reduce((s,d)=>s+d.suma,0);
+  const ext=S.donatii.filter(d=>d.tip==='extern').reduce((s,d)=>s+d.suma,0);
+  document.getElementById('don-metrics').innerHTML=`
+    <div class="metric"><div class="metric-label">Total donații</div><div class="metric-val mv-gold">${fmt(total)} RON</div></div>
+    <div class="metric"><div class="metric-label">De la membri</div><div class="metric-val mv-b">${fmt(membri)} RON</div></div>
+    <div class="metric"><div class="metric-label">De la externi</div><div class="metric-val mv-g">${fmt(ext)} RON</div></div>
+    <div class="metric"><div class="metric-label">Nr. donații</div><div class="metric-val mv-b">${S.donatii.length}</div></div>`;
+  document.getElementById('don-tbody').innerHTML=arr.map(d=>
+    '<tr><td><span class="badge '+(d.tip==='membru'?'bg-blue':'bg-gold')+'">'+(d.tip==='membru'?'Membru':'Extern')+'</span></td>'
+    +'<td><b>'+d.donator+'</b></td>'
+    +'<td style="font-size:12px">'+( d.data||'—')+'</td>'
+    +'<td style="font-weight:500;color:var(--green)">'+fmt(d.suma)+' RON</td>'
+    +'<td style="font-size:12px">'+( d.desc||'—')+'</td>'
+    +'<td class="td-actions"><button class="btn btn-outline btn-xs" onclick="openDonModal(\''+d.id+'\')">✎</button><button class="btn btn-outline btn-xs" style="color:var(--red)" onclick="delDon(\''+d.id+'\')">✕</button></td></tr>'
+  ).join('')||'<tr><td colspan="6" class="empty"><div>Nicio donație înregistrată</div></td></tr>';
+}
+function openDonModal(id){
+  editingId=id||null;
+  document.getElementById('m-don-title').textContent=id?'Editează donație':'Donație nouă';
+  if(id){
+    const d=S.donatii.find(x=>x.id===id);if(!d)return;
+    document.getElementById('don-etp').value=d.tip;
+    document.getElementById('don-edata').value=dd2iso(d.data);
+    document.getElementById('don-enum').value=d.donator;
+    document.getElementById('don-esuma').value=d.suma;
+    document.getElementById('don-emod').value=d.mod||'Cash';
+    document.getElementById('don-edesc').value=d.desc||'';
+    const f=document.getElementById('don-efoot');f.innerHTML='';
+    const del=document.createElement('button');del.className='btn btn-red btn-sm';del.style.marginRight='auto';del.textContent='🗑 Șterge';del.onclick=()=>delDon(id);
+    const ann=document.createElement('button');ann.className='btn btn-outline';ann.textContent='Anulează';ann.onclick=()=>closeModal('m-don');
+    const sav=document.createElement('button');sav.className='btn btn-rot';sav.textContent='Salvează';sav.onclick=saveDon;
+    f.appendChild(del);f.appendChild(ann);f.appendChild(sav);
+  }else{
+    document.getElementById('don-etp').value='membru';
+    document.getElementById('don-edata').value=today();
+    ['don-enum','don-esuma','don-edesc'].forEach(x=>document.getElementById(x).value='');
+    document.getElementById('don-emod').value='Cash';
+    document.getElementById('don-efoot').innerHTML='<button class="btn btn-outline" onclick="closeModal(\'m-don\')">Anulează</button><button class="btn btn-rot" onclick="saveDon()">Salvează</button>';
+  }
+  openModal('m-don');
+}
+function saveDon(){
+  const tip=document.getElementById('don-etp').value;
+  const data=iso2dd(document.getElementById('don-edata').value);
+  const donator=document.getElementById('don-enum').value.trim();
+  const suma=parseFloat(document.getElementById('don-esuma').value);
+  const mod=document.getElementById('don-emod').value;
+  const desc=document.getElementById('don-edesc').value.trim();
+  if(!donator||!suma){alert('Completează donator și sumă.');return}
+  const obj={id:editingId||uid(),tip,data,donator,suma,mod,desc};
+  const idx=S.donatii.findIndex(x=>x.id===obj.id);
+  if(idx>=0)S.donatii[idx]=obj;else S.donatii.push(obj);
+  // Sync to casa/banca
+  if(!editingId){
+    const isCash=(mod||'').toLowerCase().includes('cash');
+    const syncDesc='Donatie — '+donator+(desc?' ('+desc+')':'');
+    S.casa.push({id:'sync_don_'+obj.id,tip:'intrare',parte:donator,data,suma,desc:syncDesc});
+  }
+  saveState();closeModal('m-don');editingId=null;renderDon();
+}
+function delDon(id){if(!confirm('Ștergi?'))return;S.donatii=S.donatii.filter(x=>x.id!==id);saveState();closeModal('m-don');renderDon()}
+
+// CASA / BANCA
+function renderCasa(){
+  const q=(document.getElementById('casa-q').value||'').toLowerCase();
+  const tipF=document.getElementById('casa-tip-f').value;
+  const luna=document.getElementById('casa-luna').value;
+  let arr=sortByDate(S.casa);
+  if(luna)arr=filterByMonth(arr,luna);
+  if(tipF!=='all')arr=arr.filter(r=>r.tip===tipF);
+  if(q)arr=arr.filter(r=>(r.parte||'').toLowerCase().includes(q)||(r.desc||'').toLowerCase().includes(q));
+  const sold=calcSold(S.casa);
+  const ti=S.casa.filter(r=>r.tip==='intrare').reduce((s,r)=>s+r.suma,0);
+  const te=S.casa.filter(r=>r.tip==='iesire').reduce((s,r)=>s+r.suma,0);
+  document.getElementById('casa-metrics').innerHTML=`
+    <div class="metric"><div class="metric-label">Total intrări</div><div class="metric-val mv-g">${fmt(ti)} RON</div></div>
+    <div class="metric"><div class="metric-label">Total ieșiri</div><div class="metric-val mv-r">${fmt(te)} RON</div></div>
+    <div class="metric"><div class="metric-label">Sold casă</div><div class="metric-val ${sold>=0?'mv-g':'mv-r'}">${fmt(sold)} RON</div></div>`;
+  document.getElementById('casa-sold').innerHTML='<span style="color:'+(sold>=0?'var(--green)':'var(--red)')+'">Sold: '+fmt(sold)+' RON</span>';
+  document.getElementById('casa-tbody').innerHTML=arr.map(r=>
+    '<tr><td><span class="badge '+(r.tip==='intrare'?'bg-green':'bg-red')+'">'+(r.tip==='intrare'?'▲ Intrare':'▼ Ieșire')+'</span></td>'
+    +'<td><b>'+( r.parte||'—')+'</b></td><td style="font-size:12px">'+( r.data||'—')+'</td>'
+    +'<td style="font-weight:500;color:'+(r.tip==='intrare'?'var(--green)':'var(--red)')+'">'+( r.tip==='intrare'?'+':'−')+fmt(r.suma)+' RON</td>'
+    +'<td style="font-size:12px">'+( r.desc||'—')+'</td>'
+    +'<td class="td-actions"><button class="btn btn-outline btn-xs" onclick="openTranzModal(\'casa\',\''+r.id+'\')">✎</button><button class="btn btn-outline btn-xs" style="color:var(--red)" onclick="delTranz(\'casa\',\''+r.id+'\')">✕</button></td></tr>'
+  ).join('')||'<tr><td colspan="6" class="empty"><div>Nicio înregistrare</div></td></tr>';
+}
+function renderBanca(){
+  const q=(document.getElementById('banca-q').value||'').toLowerCase();
+  const luna=document.getElementById('banca-luna').value;
+  let arr=sortByDate(S.banca);
+  if(luna)arr=filterByMonth(arr,luna);
+  if(q)arr=arr.filter(r=>(r.parte||'').toLowerCase().includes(q)||(r.desc||'').toLowerCase().includes(q));
+  const sold=calcSold(S.banca);
+  const ti=S.banca.filter(r=>r.tip==='intrare').reduce((s,r)=>s+r.suma,0);
+  const te=S.banca.filter(r=>r.tip==='iesire').reduce((s,r)=>s+r.suma,0);
+  document.getElementById('banca-metrics').innerHTML=`
+    <div class="metric"><div class="metric-label">Total credite</div><div class="metric-val mv-g">${fmt(ti)} RON</div></div>
+    <div class="metric"><div class="metric-label">Total debite</div><div class="metric-val mv-r">${fmt(te)} RON</div></div>
+    <div class="metric"><div class="metric-label">Sold bancă</div><div class="metric-val ${sold>=0?'mv-g':'mv-r'}">${fmt(sold)} RON</div></div>`;
+  document.getElementById('banca-sold').innerHTML='<span style="color:'+(sold>=0?'var(--green)':'var(--red)')+'">Sold: '+fmt(sold)+' RON</span>';
+  document.getElementById('banca-tbody').innerHTML=arr.map(r=>
+    '<tr><td><span class="badge '+(r.tip==='intrare'?'bg-green':'bg-red')+'">'+(r.tip==='intrare'?'▲ Credit':'▼ Debit')+'</span></td>'
+    +'<td><b>'+( r.parte||'—')+'</b></td><td style="font-size:12px">'+( r.data||'—')+'</td>'
+    +'<td style="font-weight:500;color:'+(r.tip==='intrare'?'var(--green)':'var(--red)')+'">'+( r.tip==='intrare'?'+':'−')+fmt(r.suma)+' RON</td>'
+    +'<td style="font-size:12px">'+( r.desc||'—')+'</td>'
+    +'<td class="td-actions"><button class="btn btn-outline btn-xs" onclick="openTranzModal(\'banca\',\''+r.id+'\')">✎</button><button class="btn btn-outline btn-xs" style="color:var(--red)" onclick="delTranz(\'banca\',\''+r.id+'\')">✕</button></td></tr>'
+  ).join('')||'<tr><td colspan="6" class="empty"><div>Nicio tranzacție</div></td></tr>';
+}
+function openTranzModal(type,id){
+  editingId=id||null;
+  document.getElementById('tranz-type').value=type;
+  document.getElementById('m-tranz-title').textContent=(id?'Editează':'Adaugă')+' — '+(type==='casa'?'Casă':'Bancă');
+  const arr=type==='casa'?S.casa:S.banca;
+  if(id){
+    const r=arr.find(x=>x.id===id);if(!r)return;
+    document.getElementById('tranz-tip').value=r.tip;
+    document.getElementById('tranz-data').value=dd2iso(r.data);
+    document.getElementById('tranz-parte').value=r.parte||'';
+    document.getElementById('tranz-suma').value=r.suma;
+    document.getElementById('tranz-desc').value=r.desc||'';
+    const f=document.getElementById('tranz-foot');f.innerHTML='';
+    const del=document.createElement('button');del.className='btn btn-red btn-sm';del.style.marginRight='auto';del.textContent='🗑 Șterge';del.onclick=()=>{delTranz(type,id);closeModal('m-tranz')};
+    const ann=document.createElement('button');ann.className='btn btn-outline';ann.textContent='Anulează';ann.onclick=()=>closeModal('m-tranz');
+    const sav=document.createElement('button');sav.className='btn btn-rot';sav.textContent='Salvează';sav.onclick=saveTranz;
+    f.appendChild(del);f.appendChild(ann);f.appendChild(sav);
+  }else{
+    document.getElementById('tranz-tip').value='intrare';
+    document.getElementById('tranz-data').value=today();
+    ['tranz-parte','tranz-suma','tranz-desc'].forEach(x=>document.getElementById(x).value='');
+    document.getElementById('tranz-foot').innerHTML='<button class="btn btn-outline" onclick="closeModal(\'m-tranz\')">Anulează</button><button class="btn btn-rot" onclick="saveTranz()">Salvează</button>';
+  }
+  openModal('m-tranz');
+}
+function saveTranz(){
+  const type=document.getElementById('tranz-type').value;
+  const tip=document.getElementById('tranz-tip').value;
+  const data=iso2dd(document.getElementById('tranz-data').value);
+  const parte=document.getElementById('tranz-parte').value.trim();
+  const suma=parseFloat(document.getElementById('tranz-suma').value);
+  const desc=document.getElementById('tranz-desc').value.trim();
+  if(!parte||!suma||!data){alert('Completează toate câmpurile.');return}
+  const arr=type==='casa'?S.casa:S.banca;
+  const obj={id:editingId||uid(),tip,data,parte,suma,desc};
+  const idx=arr.findIndex(x=>x.id===obj.id);
+  if(idx>=0)arr[idx]=obj;else arr.push(obj);
+  saveState();closeModal('m-tranz');editingId=null;
+  if(type==='casa')renderCasa();else renderBanca();
+}
+function delTranz(type,id){
+  if(!confirm('Ștergi?'))return;
+  if(type==='casa')S.casa=S.casa.filter(x=>x.id!==id);
+  else S.banca=S.banca.filter(x=>x.id!==id);
+  saveState();if(type==='casa')renderCasa();else renderBanca();
+}
+
+// ROTARY INT
+function renderRI(){
+  const total=S.riPayments.reduce((s,p)=>s+p.suma,0);
+  const ri=S.riPayments.filter(p=>p.benef==='Rotary International').reduce((s,p)=>s+p.suma,0);
+  const dist=S.riPayments.filter(p=>p.benef==='District 2241').reduce((s,p)=>s+p.suma,0);
+  document.getElementById('ri-metrics').innerHTML=`
+    <div class="metric"><div class="metric-label">Total plătit extern</div><div class="metric-val mv-b">${fmt(total)} RON</div></div>
+    <div class="metric"><div class="metric-label">Rotary International</div><div class="metric-val mv-rot">${fmt(ri)} RON</div></div>
+    <div class="metric"><div class="metric-label">District 2241</div><div class="metric-val mv-g">${fmt(dist)} RON</div></div>`;
+  document.getElementById('ri-plati').innerHTML=S.riPayments.length?sortByDate(S.riPayments).map(p=>
+    '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bdr);font-size:13px">'
+    +'<div><div style="font-weight:500">'+p.benef+'</div><div style="font-size:11px;color:var(--text3)">'+( p.data||'—')+(p.desc?' · '+p.desc:'')+'</div></div>'
+    +'<span style="color:var(--red);font-weight:500">−'+fmt(p.suma)+' RON</span></div>'
+  ).join(''):'<div class="empty"><div>Nicio plată înregistrată</div></div>';
+}
+function openRIModal(){document.getElementById('ri-data').value=today();document.getElementById('ri-suma').value='';document.getElementById('ri-desc').value='';openModal('m-ri')}
+function saveRI(){
+  const benef=document.getElementById('ri-benef').value==='ri'?'Rotary International':document.getElementById('ri-benef').value==='dist'?'District 2241':document.getElementById('ri-benef').value;
+  const suma=parseFloat(document.getElementById('ri-suma').value);
+  const data=iso2dd(document.getElementById('ri-data').value);
+  const desc=document.getElementById('ri-desc').value;
+  if(!suma||!data){alert('Completează suma și data.');return}
+  S.riPayments.push({id:uid(),benef,suma,data,desc});
+  S.casa.push({id:'sync_ri_'+uid(),tip:'iesire',parte:benef,data,suma,desc});
+  saveState();closeModal('m-ri');renderRI();renderCasa();
+}
+
+// PROTOCOL
+function renderProt(){
+  const q=(document.getElementById('prot-q').value||'').toLowerCase();
+  let arr=sortByDate(S.protocol);
+  if(q)arr=arr.filter(p=>(p.desc||'').toLowerCase().includes(q)||(p.platit||'').toLowerCase().includes(q));
+  const total=S.protocol.reduce((s,p)=>s+p.suma,0);
+  document.getElementById('prot-metrics').innerHTML=`
+    <div class="metric"><div class="metric-label">Total cheltuieli protocol</div><div class="metric-val mv-r">${fmt(total)} RON</div></div>
+    <div class="metric"><div class="metric-label">Nr. evenimente</div><div class="metric-val mv-b">${S.protocol.length}</div></div>`;
+  document.getElementById('prot-tbody').innerHTML=arr.map(p=>
+    '<tr><td style="font-size:13px"><b>'+( p.desc||'—')+'</b></td>'
+    +'<td style="font-size:12px">'+( p.data||'—')+'</td>'
+    +'<td style="font-weight:500;color:var(--red)">'+fmt(p.suma)+' RON</td>'
+    +'<td style="font-size:12px">'+( p.platit||'—')+'</td>'
+    +'<td style="font-size:12px">'+( p.mod||'—')+'</td>'
+    +'<td class="td-actions"><button class="btn btn-outline btn-xs" onclick="openProtModal(\''+p.id+'\')">✎</button><button class="btn btn-outline btn-xs" style="color:var(--red)" onclick="delProt(\''+p.id+'\')">✕</button></td></tr>'
+  ).join('')||'<tr><td colspan="6" class="empty"><div>Nicio cheltuială înregistrată</div></td></tr>';
+}
+function openProtModal(id){
+  editingId=id||null;
+  document.getElementById('m-prot-title').textContent=id?'Editează cheltuială':'Cheltuială protocol nouă';
+  if(id){
+    const p=S.protocol.find(x=>x.id===id);if(!p)return;
+    document.getElementById('prot-edata').value=dd2iso(p.data);
+    document.getElementById('prot-esuma').value=p.suma;
+    document.getElementById('prot-edesc').value=p.desc||'';
+    document.getElementById('prot-eplatit').value=p.platit||'';
+    document.getElementById('prot-emod').value=p.mod||'Cash';
+    const f=document.getElementById('prot-efoot');f.innerHTML='';
+    const del=document.createElement('button');del.className='btn btn-red btn-sm';del.style.marginRight='auto';del.textContent='🗑 Șterge';del.onclick=()=>delProt(id);
+    const ann=document.createElement('button');ann.className='btn btn-outline';ann.textContent='Anulează';ann.onclick=()=>closeModal('m-prot');
+    const sav=document.createElement('button');sav.className='btn btn-rot';sav.textContent='Salvează';sav.onclick=saveProt;
+    f.appendChild(del);f.appendChild(ann);f.appendChild(sav);
+  }else{
+    document.getElementById('prot-edata').value=today();
+    ['prot-esuma','prot-edesc','prot-eplatit'].forEach(x=>document.getElementById(x).value='');
+    document.getElementById('prot-emod').value='Cash';
+    document.getElementById('prot-efoot').innerHTML='<button class="btn btn-outline" onclick="closeModal(\'m-prot\')">Anulează</button><button class="btn btn-rot" onclick="saveProt()">Salvează</button>';
+  }
+  openModal('m-prot');
+}
+function saveProt(){
+  const data=iso2dd(document.getElementById('prot-edata').value);
+  const suma=parseFloat(document.getElementById('prot-esuma').value);
+  const desc=document.getElementById('prot-edesc').value.trim();
+  const platit=document.getElementById('prot-eplatit').value.trim();
+  const mod=document.getElementById('prot-emod').value;
+  if(!suma||!desc){alert('Completează suma și descrierea.');return}
+  const obj={id:editingId||uid(),data,suma,desc,platit,mod};
+  const idx=S.protocol.findIndex(x=>x.id===obj.id);
+  if(idx>=0)S.protocol[idx]=obj;else{
+    S.protocol.push(obj);
+    S.casa.push({id:'sync_prot_'+obj.id,tip:'iesire',parte:platit||'Protocol',data,suma,desc});
+  }
+  saveState();closeModal('m-prot');editingId=null;renderProt();
+}
+function delProt(id){if(!confirm('Ștergi?'))return;S.protocol=S.protocol.filter(x=>x.id!==id);saveState();closeModal('m-prot');renderProt()}
+
+// RAPOARTE
+function renderRapoarte(){
+  const m=S.membri;
+  const td=m.reduce((s,x)=>s+x.cotizatieAn,0);
+  const ti=m.reduce((s,x)=>s+(x.incasat||0),0);
+  const tr=m.reduce((s,x)=>s+Math.max(0,x.cotizatieAn-(x.incasat||0)),0);
+  const pct=td>0?Math.round(ti/td*100):0;
+  const soldCasa=calcSold(S.casa);
+  const soldBanca=calcSold(S.banca);
+  const totalDon=S.donatii.reduce((s,d)=>s+d.suma,0);
+  const totalProt=S.protocol.reduce((s,p)=>s+p.suma,0);
+  const totalRI=S.riPayments.reduce((s,p)=>s+p.suma,0);
+  document.getElementById('rap-metrics').innerHTML=`
+    <div class="metric"><div class="metric-label">Colectare cotizații</div><div class="metric-val mv-b">${pct}%</div></div>
+    <div class="metric"><div class="metric-label">Total datorat</div><div class="metric-val">${fmt(td)} RON</div></div>
+    <div class="metric"><div class="metric-label">Încasat cotizații</div><div class="metric-val mv-g">${fmt(ti)} RON</div></div>
+    <div class="metric"><div class="metric-label">Donații</div><div class="metric-val mv-gold">${fmt(totalDon)} RON</div></div>
+    <div class="metric"><div class="metric-label">Sold casă</div><div class="metric-val ${soldCasa>=0?'mv-g':'mv-r'}">${fmt(soldCasa)} RON</div></div>
+    <div class="metric"><div class="metric-label">Sold bancă</div><div class="metric-val ${soldBanca>=0?'mv-g':'mv-r'}">${fmt(soldBanca)} RON</div></div>`;
+  document.getElementById('rap-prog').innerHTML=m.map(x=>{
+    const st=status(x);const pc=x.cotizatieAn>0?Math.round((x.incasat||0)/x.cotizatieAn*100):0;
+    return '<div class="prog-row"><div class="prog-name" title="'+x.nume+'">'+x.nume.split(' ')[0]+' '+x.nume.split(' ').slice(-1)[0]+'</div>'
+      +'<div class="prog-track"><div class="prog-fill '+(st==='paid'?'pf-full':st==='partial'?'pf-part':'pf-none')+'" style="width:'+Math.max(3,st==='unpaid'?3:pc)+'%"></div></div>'
+      +'<div class="prog-amt">'+fmt(x.incasat||0)+'/'+fmt(x.cotizatieAn)+'</div></div>';
+  }).join('');
+  const rest=m.filter(x=>x.incasat<x.cotizatieAn).sort((a,b)=>Math.max(0,b.cotizatieAn-b.incasat)-Math.max(0,a.cotizatieAn-a.incasat));
+  document.getElementById('rap-rest').innerHTML=rest.length?rest.map(x=>{
+    const r=Math.max(0,x.cotizatieAn-(x.incasat||0));
+    return '<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bdr);font-size:13px">'
+      +'<div><div style="font-weight:500">'+x.nume+'</div><div style="font-size:11px;color:var(--text3)">'+x.rol+'</div></div>'
+      +'<span style="color:var(--red);font-weight:500">'+fmt(r)+' RON</span></div>';
+  }).join(''):'<div class="empty"><div>✅ Toți achitați!</div></div>';
+  document.getElementById('rap-solduri').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px">
+      <div style="background:var(--bg2);border-radius:8px;padding:10px 12px"><div style="font-size:11px;color:var(--text3)">Sold casă</div><div style="font-size:16px;font-weight:500;color:${soldCasa>=0?'var(--green)':'var(--red)'}">${fmt(soldCasa)} RON</div></div>
+      <div style="background:var(--bg2);border-radius:8px;padding:10px 12px"><div style="font-size:11px;color:var(--text3)">Sold bancă</div><div style="font-size:16px;font-weight:500;color:${soldBanca>=0?'var(--green)':'var(--red)'}">${fmt(soldBanca)} RON</div></div>
+      <div style="background:var(--bg2);border-radius:8px;padding:10px 12px"><div style="font-size:11px;color:var(--text3)">Total donații</div><div style="font-size:16px;font-weight:500;color:var(--amber)">${fmt(totalDon)} RON</div></div>
+      <div style="background:var(--bg2);border-radius:8px;padding:10px 12px"><div style="font-size:11px;color:var(--text3)">Plăți externe</div><div style="font-size:16px;font-weight:500;color:var(--red)">${fmt(totalRI)} RON</div></div>
+    </div>`;
+}
+
+function toggleRI(id){
+  const m=S.membri.find(x=>x.id===id);
+  if(!m)return;
+  m.ri2026paid=!m.ri2026paid;
+  saveState();
+  showFisa(id);
+}
+
+// EXPORT/IMPORT/RESET
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='Rotary_SM_Cetate_backup_'+new Date().toISOString().slice(0,10)+'.json';a.click();
+}
+function importJSON(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{try{if(!confirm('Suprascriem datele?'))return;S=JSON.parse(ev.target.result);saveState();location.reload()}catch(err){alert('JSON invalid.')}};
+  r.readAsText(f);
+}
+function resetData(){if(!confirm('Resetezi la datele inițiale?'))return;localStorage.removeItem('rotary_data');localStorage.removeItem('rotary_ver');location.reload()}
+function exportCSV(type){
+  let rows,name,arr;
+  if(type==='cot'){
+    rows=[['Rol','Nume','ID Rotary','Cotizatie anuala','Incasat','Rest','Status']];
+    S.membri.forEach(m=>rows.push([m.rol,m.nume,m.rotaryId,m.cotizatieAn,m.incasat||0,Math.max(0,m.cotizatieAn-(m.incasat||0)),status(m)==='paid'?'Achitat':status(m)==='partial'?'Partial':'Restant']));
+    name='Rotary_cotizatii.csv';
+  }else if(type==='don'){
+    rows=[['Tip','Donator','Data','Suma','Mod','Descriere']];
+    sortByDate(S.donatii).forEach(d=>rows.push([d.tip,d.donator,d.data,d.suma,d.mod,d.desc]));
+    name='Rotary_donatii.csv';
+  }else if(type==='casa'){
+    rows=[['Tip','Platitor/Beneficiar','Data','Suma RON','Descriere']];
+    sortByDate(S.casa).forEach(r=>rows.push([r.tip==='intrare'?'Intrare':'Iesire',r.parte,r.data,r.suma,r.desc]));
+    rows.push(['','','Sold',calcSold(S.casa),'']);
+    name='Rotary_casa.csv';
+  }else{
+    rows=[['Tip','Platitor/Beneficiar','Data','Suma RON','Descriere']];
+    sortByDate(S.banca).forEach(r=>rows.push([r.tip==='intrare'?'Credit':'Debit',r.parte,r.data,r.suma,r.desc]));
+    rows.push(['','','Sold',calcSold(S.banca),'']);
+    name='Rotary_banca.csv';
+  }
+  const csv=rows.map(r=>r.map(v=>'"'+(String(v||'').replace(/"/g,'""'))+'"').join(',')).join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();
+}
+function printTable(type){
+  const area=document.getElementById('print-area');
+  area.innerHTML='<div style="font-family:Crimson Pro,serif;font-size:18px;font-weight:600;margin-bottom:10px">Rotary Club Satu Mare Cetate</div>';
+  const map={cot:'p-cotizatii',donatii:'p-donatii',casa:'p-casa',protocol:'p-protocol',ri:'p-rotary_int',rap:'p-rapoarte'};
+  const el=document.getElementById(map[type]);
+  if(el)area.innerHTML+=el.innerHTML;
+  area.querySelectorAll('button,input,select,.filter-row,.itabs').forEach(b=>b.remove());
+  window.print();setTimeout(()=>area.innerHTML='',1000);
+}
+
+// INIT
+renderCotMetrics();renderCot();
+</script>
+
+<div class="overlay" id="m-tranz2">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title" id="tranz-title">Înregistrare</span><button class="modal-close" onclick="closeModal('m-tranz2')">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="tranz-type2">
+      <div class="frow">
+        <div class="fg"><label class="fl">Data</label><input class="fi2" type="date" id="tranz-data2"></div>
+        <div class="fg"><label class="fl">Suma (RON) *</label><input class="fi2" type="number" id="tranz-suma2"></div>
+      </div>
+      <div class="fg"><label class="fl">Platitor / Beneficiar *</label><input class="fi2" type="text" id="tranz-parte2"></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Mod</label>
+          <select class="fi2" id="tranz-mod2"><option>Cash</option><option>BT Pay</option><option>Transfer bancar</option><option>Card</option></select>
+        </div>
+        <div class="fg"><label class="fl">Descriere</label><input class="fi2" type="text" id="tranz-desc2"></div>
+      </div>
+    </div>
+    <div class="modal-foot" id="tranz-foot2">
+      <button class="btn btn-outline" onclick="closeModal('m-tranz2')">Anulează</button>
+      <button class="btn btn-rot" onclick="saveTranz2()">Salvează</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
