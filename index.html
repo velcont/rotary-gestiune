@@ -169,8 +169,8 @@ textarea.fi2{min-height:60px;resize:vertical}
     <table>
       <thead><tr>
         <th>Rol</th><th>Nume</th><th>ID Rotary</th>
-        <th>Cotizație anuală</th><th>Încasat</th><th>Rest</th>
-        <th>Ultima plată</th><th>Status</th><th></th>
+        <th>Cotizație anuală</th><th>Încasat</th><th>Rest club</th>
+        <th>Rest RI</th><th>Status</th><th></th>
       </tr></thead>
       <tbody id="cot-tbody"></tbody>
     </table>
@@ -481,7 +481,7 @@ textarea.fi2{min-height:60px;resize:vertical}
 </div>
 
 <script>
-const VER='rotary-2.3.0';
+const VER='rotary-2.4.0';
 function saveState(){localStorage.setItem('rotary_data',JSON.stringify(S))}
 function loadState(){
   const v=localStorage.getItem('rotary_ver');
@@ -734,6 +734,7 @@ function renderCot(){
     const bc=m.scutit?'bg-blue':st==='paid'?'bg-green':st==='partial'?'bg-amber':'bg-red';
     const bt=m.scutit?'Scutit ✓':st==='paid'?'Achitat':st==='partial'?'Parțial':'Restant';
     const rest=Math.max(0,m.cotizatieAn-(m.incasat||0));
+    const riRest=m.scutit?0:(m.ri2026paid?0:250);
     const pays=S.payments.filter(p=>p.memId===m.id);
     const lastPay=pays.length?pays[pays.length-1]:null;
     return '<tr>'
@@ -743,7 +744,7 @@ function renderCot(){
       +'<td>'+fmt(m.cotizatieAn)+' RON</td>'
       +'<td style="color:var(--green);font-weight:500">'+fmt(m.incasat||0)+' RON</td>'
       +'<td style="color:'+(rest>0?'var(--red)':'var(--green)')+';font-weight:500">'+(rest>0?fmt(rest)+' RON':'—')+'</td>'
-      +'<td style="font-size:12px">'+(lastPay?lastPay.data+' · '+lastPay.suma+' RON':'—')+'</td>'
+      +'<td style="color:'+(riRest>0?'var(--red)':'var(--green)')+';font-weight:500">'+(m.scutit?'—':riRest>0?fmt(riRest)+' RON':'✓')+'</td>'
       +'<td><span class="badge '+bc+'">'+bt+'</span></td>'
       +'<td class="td-actions">'
       +'<button class="btn btn-outline btn-xs" onclick="showFisa('+m.id+')">Fișă</button>'
