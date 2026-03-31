@@ -124,6 +124,7 @@ textarea.fi2{min-height:60px;resize:vertical}
     <div class="ns">Plăți externe</div>
     <button class="ni" onclick="nav('rotary_int',this)"><span class="ic">🌍</span>Rotary Intl / District</button>
     <button class="ni" onclick="nav('protocol',this)"><span class="ic">🍽</span>Protocol & Evenimente</button>
+    <button class="ni" onclick="nav('bilete',this)"><span class="ic">🎟</span>Bilete & Evenimente</button>
     <div class="ns">Analiză</div>
     <button class="ni" onclick="nav('rapoarte',this)"><span class="ic">📊</span>Rapoarte</button>
   </nav>
@@ -287,6 +288,58 @@ textarea.fi2{min-height:60px;resize:vertical}
       <thead><tr><th>Eveniment / Descriere</th><th>Data</th><th>Suma (RON)</th><th>Plătit de</th><th>Mod</th><th></th></tr></thead>
       <tbody id="prot-tbody"></tbody>
     </table>
+    </div>
+  </div>
+</div>
+
+<!-- BILETE -->
+<div id="p-bilete" class="panel">
+  <div class="metrics" id="bilete-metrics"></div>
+  <div class="filter-row">
+    <button class="btn btn-rot btn-sm" onclick="openBiletModal(null)">+ Adaugă bilete</button>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV('bilete')">⬇ CSV</button>
+    <input class="fi fi-wide" type="text" id="bilete-q" placeholder="🔍 Caută eveniment..." oninput="renderBilete()">
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">Registru bilete & evenimente</span></div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr>
+        <th>Eveniment</th><th>Data</th><th>Nr. bilete</th>
+        <th>Preț/bilet</th><th>Total</th><th>Platitor</th><th>Mod</th><th>Obs.</th><th></th>
+      </tr></thead>
+      <tbody id="bilete-tbody"></tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL BILET -->
+<div class="overlay" id="m-bilet">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title" id="m-bilet-title">Bilete eveniment</span><button class="modal-close" onclick="closeModal('m-bilet')">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="bilet-eid">
+      <div class="fg"><label class="fl">Eveniment *</label><input class="fi2" type="text" id="bilet-ev" placeholder="ex: Cartare, Gala, Conferinta..."></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Data</label><input class="fi2" type="date" id="bilet-data"></div>
+        <div class="fg"><label class="fl">Nr. bilete *</label><input class="fi2" type="number" id="bilet-nr" min="1" placeholder="ex: 3" oninput="calcBiletTotal()"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Preț per bilet (RON) *</label><input class="fi2" type="number" id="bilet-pret" placeholder="ex: 400" oninput="calcBiletTotal()"></div>
+        <div class="fg"><label class="fl">Total (RON)</label><input class="fi2" type="number" id="bilet-total" placeholder="calculat automat" readonly style="background:var(--bg2)"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Platitor</label><input class="fi2" type="text" id="bilet-platitor" placeholder="ex: Lengyel Anita"></div>
+        <div class="fg"><label class="fl">Mod plată</label>
+          <select class="fi2" id="bilet-mod"><option>Cash</option><option>Transfer bancar</option><option>BT Pay</option><option>Card</option></select>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Observații</label><input class="fi2" type="text" id="bilet-obs"></div>
+    </div>
+    <div class="modal-foot" id="bilet-foot">
+      <button class="btn btn-outline" onclick="closeModal('m-bilet')">Anulează</button>
+      <button class="btn btn-rot" onclick="saveBilet()">Salvează</button>
     </div>
   </div>
 </div>
@@ -481,7 +534,7 @@ textarea.fi2{min-height:60px;resize:vertical}
 </div>
 
 <script>
-const VER='rotary-2.4.0';
+const VER='rotary-2.6.0';
 function saveState(){localStorage.setItem('rotary_data',JSON.stringify(S))}
 function loadState(){
   const v=localStorage.getItem('rotary_ver');
@@ -493,6 +546,7 @@ function loadState(){
   if(!s.protocol)s.protocol=[];
   if(!s.incasari2)s.incasari2=JSON.parse(JSON.stringify(INCASARI2_INIT));
   if(!s.cheltuieli2)s.cheltuieli2=JSON.parse(JSON.stringify(CHELTUIELI2_INIT));
+  if(!s.bilete)s.bilete=JSON.parse(JSON.stringify(BILETE_INIT));
   if(!s.riPayments)s.riPayments=[];
   if(!s.chitNr)s.chitNr=1;
   if(!s.m2025)s.m2025=JSON.parse(JSON.stringify(M2025_INIT));
@@ -510,6 +564,7 @@ function freshState(){return{
   protocol:JSON.parse(JSON.stringify(PROTOCOL_INIT)),
   incasari2:JSON.parse(JSON.stringify(INCASARI2_INIT)),
   cheltuieli2:JSON.parse(JSON.stringify(CHELTUIELI2_INIT)),
+  bilete:JSON.parse(JSON.stringify(BILETE_INIT)),
   riPayments:JSON.parse(JSON.stringify(RI_INIT)),
   chitNr:1
 }}
@@ -631,6 +686,10 @@ const CHELTUIELI2_INIT=[
   {id:'ci7',data:'24.03.2026',parte:'Ana Tanasie',suma:1036,mod:'Transfer bancar',desc:'Prin Andrei H.'},
   {id:'ci8',data:'28.03.2026',parte:'Andrei Henciu',suma:64,mod:'Cash',desc:'Sume la Andrei'},
 ];
+const BILETE_INIT=[
+  {id:'bilet_cartare_310326',eveniment:'Cartare',data:'31.03.2026',nrBilete:3,pretBilet:400,total:1200,platitor:'Lengyel Anita Larisa',mod:'Cash',obs:'3 bilete cartare platite de Anita'},
+];
+
 const RI_INIT=[
   {id:'ri1',benef:'District 2241',suma:600,data:'20.01.2026',desc:'Cotizatie District 2241 sem.I 2025-2026'},
   {id:'ri2',benef:'Rotary International',suma:4372,data:'30.01.2026',desc:'Cotizatie Rotary International 850 EUR sem.I 2025-2026'},
@@ -668,8 +727,8 @@ function getAnData(an){
 }
 function getCurAn(){return document.getElementById('cot-an')?document.getElementById('cot-an').value:'2026';}
 
-const TITLES={cotizatii:'Cotizații membri',donatii:'Donații',casa:'Registru casă',banca:'Jurnal bancă',donatii:'Donații',rotary_int:'Rotary International & District',protocol:'Protocol & Evenimente',rapoarte:'Rapoarte'};
-const SUBS={cotizatii:'100 RON/lună per membru · An fiscal 2025-2026',donatii:'Donații membri și externi',casa:'Înregistrări numerar · sold curent',banca:'Tranzacții cont bancă · sold curent',donatii:'Donații membri și externi',rotary_int:'Plăți cotizații internaționale și district',protocol:'Cheltuieli protocol și organizare evenimente',rapoarte:'Situație generală financiară'};
+const TITLES={cotizatii:'Cotizații membri',donatii:'Donații',casa:'Registru casă',banca:'Jurnal bancă',donatii:'Donații',rotary_int:'Rotary International & District',protocol:'Protocol & Evenimente',bilete:'Bilete & Evenimente',rapoarte:'Rapoarte'};
+const SUBS={cotizatii:'100 RON/lună per membru · An fiscal 2025-2026',donatii:'Donații membri și externi',casa:'Înregistrări numerar · sold curent',banca:'Tranzacții cont bancă · sold curent',donatii:'Donații membri și externi',rotary_int:'Plăți cotizații internaționale și district',protocol:'Cheltuieli protocol și organizare evenimente',bilete:'Registru bilete și încasări evenimente',rapoarte:'Situație generală financiară'};
 
 function nav(name,btn){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
@@ -1220,6 +1279,98 @@ function renderRapoarte(){
     </div>`;
 }
 
+// BILETE
+function calcBiletTotal(){
+  const nr=parseFloat(document.getElementById('bilet-nr').value)||0;
+  const pret=parseFloat(document.getElementById('bilet-pret').value)||0;
+  document.getElementById('bilet-total').value=nr*pret||'';
+}
+function renderBilete(){
+  if(!S.bilete)S.bilete=[];
+  const q=(document.getElementById('bilete-q').value||'').toLowerCase();
+  let arr=[...S.bilete].sort((a,b)=>{
+    const p=s=>{const q=(s||'').split('.');return q.length===3?q[2]+q[1]+q[0]:s||''};
+    return p(b.data).localeCompare(p(a.data));
+  });
+  if(q)arr=arr.filter(b=>(b.eveniment||'').toLowerCase().includes(q)||(b.platitor||'').toLowerCase().includes(q));
+  const total=S.bilete.reduce((s,b)=>s+b.total,0);
+  const nrTotal=S.bilete.reduce((s,b)=>s+b.nrBilete,0);
+  document.getElementById('bilete-metrics').innerHTML=`
+    <div class="metric"><div class="metric-label">Total încasat bilete</div><div class="metric-val mv-g">${fmt(total)} RON</div></div>
+    <div class="metric"><div class="metric-label">Total bilete vândute</div><div class="metric-val mv-b">${nrTotal}</div></div>
+    <div class="metric"><div class="metric-label">Nr. evenimente</div><div class="metric-val mv-b">${S.bilete.length}</div></div>`;
+  document.getElementById('bilete-tbody').innerHTML=arr.map(b=>
+    '<tr><td><b>'+(b.eveniment||'—')+'</b></td>'
+    +'<td style="font-size:12px">'+(b.data||'—')+'</td>'
+    +'<td style="text-align:center;font-weight:500">'+b.nrBilete+'</td>'
+    +'<td>'+fmt(b.pretBilet)+' RON</td>'
+    +'<td style="color:var(--green);font-weight:600">'+fmt(b.total)+' RON</td>'
+    +'<td style="font-size:12px">'+(b.platitor||'—')+'</td>'
+    +'<td style="font-size:12px">'+(b.mod||'—')+'</td>'
+    +'<td style="font-size:12px">'+(b.obs||'—')+'</td>'
+    +'<td class="td-actions">'
+    +'<button class="btn btn-outline btn-xs bilet-edit" data-id="'+b.id+'">✎</button>'
+    +'<button class="btn btn-outline btn-xs bilet-del" style="color:var(--red)" data-id="'+b.id+'">✕</button>'
+    +'</td></tr>'
+  ).join('')||'<tr><td colspan="9" class="empty">Niciun bilet înregistrat</td></tr>';
+  document.getElementById('bilete-tbody').addEventListener('click',function(e){
+    const edit=e.target.closest('.bilet-edit');
+    const del=e.target.closest('.bilet-del');
+    if(edit)openBiletModal(edit.dataset.id);
+    if(del){if(!confirm('Ștergi?'))return;S.bilete=S.bilete.filter(x=>x.id!==del.dataset.id);saveState();renderBilete();}
+  },{once:false});
+}
+function openBiletModal(id){
+  editingId=id||null;
+  document.getElementById('m-bilet-title').textContent=id?'Editează bilete':'Bilete eveniment nou';
+  if(id){
+    const b=(S.bilete||[]).find(x=>x.id===id);if(!b)return;
+    document.getElementById('bilet-ev').value=b.eveniment||'';
+    document.getElementById('bilet-data').value=dd2iso(b.data);
+    document.getElementById('bilet-nr').value=b.nrBilete||'';
+    document.getElementById('bilet-pret').value=b.pretBilet||'';
+    document.getElementById('bilet-total').value=b.total||'';
+    document.getElementById('bilet-platitor').value=b.platitor||'';
+    document.getElementById('bilet-mod').value=b.mod||'Cash';
+    document.getElementById('bilet-obs').value=b.obs||'';
+    const f=document.getElementById('bilet-foot');f.innerHTML='';
+    const del=document.createElement('button');del.className='btn btn-red btn-sm';del.style.marginRight='auto';del.textContent='🗑 Șterge';
+    del.onclick=()=>{if(!confirm('Ștergi?'))return;S.bilete=S.bilete.filter(x=>x.id!==id);saveState();closeModal('m-bilet');renderBilete()};
+    const ann=document.createElement('button');ann.className='btn btn-outline';ann.textContent='Anulează';ann.onclick=()=>closeModal('m-bilet');
+    const sav=document.createElement('button');sav.className='btn btn-rot';sav.textContent='Salvează';sav.onclick=saveBilet;
+    f.appendChild(del);f.appendChild(ann);f.appendChild(sav);
+  }else{
+    ['bilet-ev','bilet-nr','bilet-pret','bilet-total','bilet-platitor','bilet-obs'].forEach(x=>document.getElementById(x).value='');
+    document.getElementById('bilet-data').value=today();
+    document.getElementById('bilet-mod').value='Cash';
+    const bf=document.getElementById('bilet-foot');bf.innerHTML='';
+    const bann=document.createElement('button');bann.className='btn btn-outline';bann.textContent='Anulează';bann.onclick=()=>closeModal('m-bilet');
+    const bsav=document.createElement('button');bsav.className='btn btn-rot';bsav.textContent='Salvează';bsav.onclick=saveBilet;
+    bf.appendChild(bann);bf.appendChild(bsav);
+  }
+  openModal('m-bilet');
+}
+function saveBilet(){
+  const eveniment=document.getElementById('bilet-ev').value.trim();
+  const data=iso2dd(document.getElementById('bilet-data').value);
+  const nrBilete=parseInt(document.getElementById('bilet-nr').value)||0;
+  const pretBilet=parseFloat(document.getElementById('bilet-pret').value)||0;
+  const total=nrBilete*pretBilet;
+  const platitor=document.getElementById('bilet-platitor').value.trim();
+  const mod=document.getElementById('bilet-mod').value;
+  const obs=document.getElementById('bilet-obs').value.trim();
+  if(!eveniment||!nrBilete||!pretBilet){alert('Completează eveniment, nr. bilete și preț.');return}
+  if(!S.bilete)S.bilete=[];
+  const obj={id:editingId||uid(),eveniment,data,nrBilete,pretBilet,total,platitor,mod,obs};
+  const idx=S.bilete.findIndex(x=>x.id===obj.id);
+  if(idx>=0)S.bilete[idx]=obj;
+  else{
+    S.bilete.push(obj);
+    S.casa.push({id:'sync_bilet_'+obj.id,tip:'intrare',parte:platitor||eveniment,data,suma:total,desc:'Bilete '+eveniment+' ('+nrBilete+' x '+fmt(pretBilet)+' RON)'});
+  }
+  saveState();closeModal('m-bilet');editingId=null;renderBilete();
+}
+
 function toggleRI(id){
   const m=S.membri.find(x=>x.id===id);
   if(!m)return;
@@ -1279,6 +1430,567 @@ function printTable(type){
 // INIT
 renderCotMetrics();renderCot();
 </script>
+
+<div class="overlay" id="m-tranz2">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title" id="tranz-title">Înregistrare</span><button class="modal-close" onclick="closeModal('m-tranz2')">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="tranz-type2">
+      <div class="frow">
+        <div class="fg"><label class="fl">Data</label><input class="fi2" type="date" id="tranz-data2"></div>
+        <div class="fg"><label class="fl">Suma (RON) *</label><input class="fi2" type="number" id="tranz-suma2"></div>
+      </div>
+      <div class="fg"><label class="fl">Platitor / Beneficiar *</label><input class="fi2" type="text" id="tranz-parte2"></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Mod</label>
+          <select class="fi2" id="tranz-mod2"><option>Cash</option><option>BT Pay</option><option>Transfer bancar</option><option>Card</option></select>
+        </div>
+        <div class="fg"><label class="fl">Descriere</label><input class="fi2" type="text" id="tranz-desc2"></div>
+      </div>
+    </div>
+    <div class="modal-foot" id="tranz-foot2">
+      <button class="btn btn-outline" onclick="closeModal('m-tranz2')">Anulează</button>
+      <button class="btn btn-rot" onclick="saveTranz2()">Salvează</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>const PRELOADED_BACKUP=JSON.parse('{"membri": [{"id": 1, "nume": "Lengyel Anita Larisa", "rol": "Club President", "rotaryId": "11483016", "email": "anitaovidiu@yahoo.com", "tel": "0742155667", "ri2026": 250, "ri2026paid": true}, {"id": 2, "nume": "Henciu Andrei", "rol": "Club Secretary", "rotaryId": "11483019", "email": "henciua@yahoo.com", "tel": "0744441607", "ri2026": 250, "ri2026paid": false}, {"id": 3, "nume": "Suciu Gyorfi Nicolae", "rol": "Club Treasurer", "rotaryId": "12500402", "email": "suciugyorfinicolae@icloud.com", "tel": "0731377793", "ri2026": 250, "ri2026paid": true}, {"id": 4, "nume": "Pasca Cristian Vasile", "rol": "Club Vice President", "rotaryId": "9858164", "email": "cristian@lebada.ro", "tel": "0742731151", "scutit": true, "obs": "Scutit — proprietar spatiu sedinte"}, {"id": 5, "nume": "Steinbinder Ingrid", "rol": "Club Executive Secretary", "rotaryId": "11939959", "email": "steinbinderi@gmail.com", "tel": "0743695956", "ri2026": 250, "ri2026paid": true}, {"id": 6, "nume": "Henciu Oana Madalina", "rol": "Club Foundation Chair", "rotaryId": "11483665", "email": "live4today23@yahoo.com", "tel": "0755230230", "ri2026": 250, "ri2026paid": false}, {"id": 7, "nume": "Veres Gabriela Cornelia", "rol": "Club Foundation Member", "rotaryId": "12500651", "email": "gabriela.veres@gmail.com", "tel": "0758577578", "ri2026": 250, "ri2026paid": false}, {"id": 8, "nume": "Vonet Anca", "rol": "Club Foundation Member", "rotaryId": "12500716", "email": "ancavonet@yahoo.com", "tel": "0753020116", "ri2026": 250, "ri2026paid": true}, {"id": 9, "nume": "Bota Cosmin Gheorghe", "rol": "Club Membership Chair", "rotaryId": "11483663", "email": "cosmin.bota@gmail.com", "tel": "0723462077", "ri2026": 250, "ri2026paid": true}, {"id": 10, "nume": "Tuturas Bogdan Dumitru", "rol": "Club Membership Member", "rotaryId": "12161172", "email": "tuturasbogdan@yahoo.com", "tel": "0728557611", "ri2026": 250, "ri2026paid": true}, {"id": 11, "nume": "Suciu Gyorfi Daniela", "rol": "Club Membership Member", "rotaryId": "12500643", "email": "danielasuciugyorfi@gmail.com", "tel": "0722444522", "ri2026": 250, "ri2026paid": true}, {"id": 12, "nume": "Seucea Ramona Anca", "rol": "Club Learning Facilitator Chair", "rotaryId": "11483675", "email": "anca_man@yahoo.com", "tel": "0743046734", "ri2026": 250, "ri2026paid": true}, {"id": 13, "nume": "Havrincea Aurelia Dorina", "rol": "Club Learning Facilitator", "rotaryId": "12500628", "email": "havrincea_aura@yahoo.com", "tel": "0721770667", "ri2026": 250, "ri2026paid": true}, {"id": 14, "nume": "Chira Cristina", "rol": "Club Learning Facilitator", "rotaryId": "12500721", "email": "drchiracristina@yahoo.ro", "tel": "0742911248", "ri2026": 250, "ri2026paid": true}, {"id": 15, "nume": "Deac Vlad Birtoc", "rol": "Club Public Image Chair", "rotaryId": "12500724", "email": "deacvlad7@gmail.com", "tel": "0740150894", "ri2026": 250, "ri2026paid": true}, {"id": 16, "nume": "Deac Kaiser Stefanie Brigitte", "rol": "Club Public Image Member", "rotaryId": "12500723", "email": "stefaniebrigittekaiser@gmail.com", "tel": "0745286194", "ri2026": 250, "ri2026paid": true}, {"id": 17, "nume": "Haisiuc Raluca Maria", "rol": "Club Service Projects Chair", "rotaryId": "11483668", "email": "raluca.maria.trif@gmail.com", "tel": "0743862911", "ri2026": 250, "ri2026paid": true}, {"id": 18, "nume": "Cheregi Roxana Doris", "rol": "Club Service Projects Member", "rotaryId": "12500718", "email": "roxydorischeregi@gmail.com", "tel": "0724601512", "ri2026": 250, "ri2026paid": false}, {"id": 19, "nume": "Lazarescu Adina Maria", "rol": "Club Service Projects Member", "rotaryId": "12500629", "email": "adina.lzr@gmail.com", "tel": "0744224398", "ri2026": 250, "ri2026paid": true}, {"id": 20, "nume": "Lengyel Ovidiu Sebastian", "rol": "Club Member", "rotaryId": "12500633", "email": "ovidiuanita@yahoo.com", "tel": "0740968675", "ri2026": 250, "ri2026paid": true}], "m2025": [{"memId": 1, "an": "2025", "cotizatieAn": 200, "incasat": 200, "rest": 0}, {"memId": 2, "an": "2025", "cotizatieAn": 200, "incasat": 200, "rest": 0}, {"memId": 3, "an": "2025", "cotizatieAn": 200, "incasat": 200, "rest": 0}, {"memId": 4, "an": "2025", "cotizatieAn": 0, "incasat": 0, "rest": 0, "scutit": true}, {"memId": 5, "an": "2025", "cotizatieAn": 200, "incasat": 200, "rest": 0}, {"memId": 6, "an": "2025", "cotizatieAn": 200, "incasat": 200, "rest": 0}, {"memId": 7, "an": "2025", "cotizatieAn": 200, "incasat": 0, "rest": 200}, {"memId": 8, "an": "2025", "cotizatieAn": 200, "incasat": 200, "rest": 0}, {"memId": 9, "an": "2025", "cotizatieAn": 200, "incasat": 200, "rest": 0}, {"memId": 10, "an": "2025", "cotizatieAn": 200, "incasat": 200, "rest": 0}, {"memId": 11, "an": "2025", "cotizatieAn": 200, "incasat": 200, "rest": 0}, {"memId": 12, "an": "2025", "cotizatieAn": 200, "incasat": 200, "rest": 0}, {"memId": 13, "an": "2025", "cotizatieAn": 200, "incasat": 200, "rest": 0}, {"memId": 14, "an": "2025", "cotizatieAn": 200, "incasat": 200, "rest": 0}, {"memId": 15, "an": "2025", "cotizatieAn": 200, "incasat": 200, "rest": 0}, {"memId": 16, "an": "2025", "cotizatieAn": 200, "incasat": 200, "rest": 0}, {"memId": 17, "an": "2025", "cotizatieAn": 200, "incasat": 200, "rest": 0}, {"memId": 18, "an": "2025", "cotizatieAn": 200, "incasat": 200, "rest": 0}, {"memId": 19, "an": "2025", "cotizatieAn": 200, "incasat": 200, "rest": 0}, {"memId": 20, "an": "2025", "cotizatieAn": 200, "incasat": 200, "rest": 0}], "m2026": [{"memId": 1, "an": "2026", "cotizatieAn": 600, "incasat": 600, "rest": 0}, {"memId": 2, "an": "2026", "cotizatieAn": 600, "incasat": 200, "rest": 400}, {"memId": 3, "an": "2026", "cotizatieAn": 600, "incasat": 200, "rest": 400}, {"memId": 4, "an": "2026", "cotizatieAn": 0, "incasat": 0, "rest": 0, "scutit": true}, {"memId": 5, "an": "2026", "cotizatieAn": 600, "incasat": 300, "rest": 300}, {"memId": 6, "an": "2026", "cotizatieAn": 600, "incasat": 200, "rest": 400}, {"memId": 7, "an": "2026", "cotizatieAn": 600, "incasat": 0, "rest": 600}, {"memId": 8, "an": "2026", "cotizatieAn": 600, "incasat": 100, "rest": 500}, {"memId": 9, "an": "2026", "cotizatieAn": 600, "incasat": 100, "rest": 500}, {"memId": 10, "an": "2026", "cotizatieAn": 600, "incasat": 100, "rest": 500}, {"memId": 11, "an": "2026", "cotizatieAn": 600, "incasat": 200, "rest": 400}, {"memId": 12, "an": "2026", "cotizatieAn": 600, "incasat": 300, "rest": 300}, {"memId": 13, "an": "2026", "cotizatieAn": 600, "incasat": 200, "rest": 400}, {"memId": 14, "an": "2026", "cotizatieAn": 600, "incasat": 100, "rest": 500}, {"memId": 15, "an": "2026", "cotizatieAn": 600, "incasat": 650, "rest": 0}, {"memId": 16, "an": "2026", "cotizatieAn": 600, "incasat": 650, "rest": 0}, {"memId": 17, "an": "2026", "cotizatieAn": 600, "incasat": 100, "rest": 500}, {"memId": 18, "an": "2026", "cotizatieAn": 600, "incasat": 0, "rest": 600}, {"memId": 19, "an": "2026", "cotizatieAn": 600, "incasat": 300, "rest": 300}, {"memId": 20, "an": "2026", "cotizatieAn": 600, "incasat": 600, "rest": 0}], "payments": [{"id": "pay_anita_310326", "memId": 1, "an": "2026", "suma": 400, "data": "31.03.2026", "mod": "Cash", "obs": "Cotizatie ian-apr 2026 (adusa la birou)"}, {"id": "pay_ovidiu_310326", "memId": 20, "an": "2026", "suma": 400, "data": "31.03.2026", "mod": "Cash", "obs": "Cotizatie ian-apr 2026 (platita de Anita)"}], "casa": [{"id": "c_i1", "tip": "intrare", "parte": "Membri fondatori", "data": "29.08.2025", "suma": 380, "desc": "Donatie fondare club"}, {"id": "c_i2", "tip": "intrare", "parte": "Membri - sedinta 27.11.2025", "data": "27.11.2025", "suma": 2600, "desc": "Incasare cotizatii sedinta (BT Pay)"}, {"id": "c_i3", "tip": "intrare", "parte": "Membri - sedinta 15.01.2026", "data": "15.01.2026", "suma": 3000, "desc": "Incasare cotizatii sedinta"}, {"id": "c_i4", "tip": "intrare", "parte": "Membri - sedinta 29.01.2026", "data": "29.01.2026", "suma": 1250, "desc": "Incasare cotizatii sedinta"}, {"id": "c_i5", "tip": "intrare", "parte": "Membri - sedinta 12.02.2026", "data": "12.02.2026", "suma": 1650, "desc": "Incasare cotizatii sedinta (BTPay)"}, {"id": "c_i6", "tip": "intrare", "parte": "Membri - sedinta 26.02.2026", "data": "26.02.2026", "suma": 1050, "desc": "Incasare cotizatii sedinta"}, {"id": "c_i7", "tip": "intrare", "parte": "Membri - sedinta 05.03.2026", "data": "05.03.2026", "suma": 600, "desc": "Incasare cotizatii sedinta (BTPay)"}, {"id": "c_i8", "tip": "intrare", "parte": "Membri - sedinta 28.03.2026", "data": "28.03.2026", "suma": 1300, "desc": "Incasare cotizatii sedinta"}, {"id": "c_e1", "tip": "iesire", "parte": "Restaurant Aurora", "data": "27.11.2025", "suma": 1003, "desc": "Agapa R.Aurora 27.11.2025"}, {"id": "c_e2", "tip": "iesire", "parte": "Asoc. Rotary Ind. Distr.2241", "data": "20.01.2026", "suma": 600, "desc": "Cotizatie District 2241"}, {"id": "c_e3", "tip": "iesire", "parte": "Rotary Lion Bucuresti", "data": "29.01.2026", "suma": 1000, "desc": "Eveniment caritabil (prin Andrei H.)"}, {"id": "c_e4", "tip": "iesire", "parte": "Rotary International", "data": "30.01.2026", "suma": 4372, "desc": "Cotizatie RI 850 EUR sem.I 2025-2026"}, {"id": "c_e5", "tip": "iesire", "parte": "Fanioane personalizate", "data": "12.02.2026", "suma": 405, "desc": "10 buc (prin Andrei H.)"}, {"id": "c_e6", "tip": "iesire", "parte": "RC Galati / PELS Cluj Napoca", "data": "16.03.2026", "suma": 2900, "desc": "Fam. Henciu"}, {"id": "c_e7", "tip": "iesire", "parte": "Ana Tanasie", "data": "24.03.2026", "suma": 1036, "desc": "Prin Andrei H."}, {"id": "c_e8", "tip": "iesire", "parte": "Andrei Henciu", "data": "28.03.2026", "suma": 64, "desc": "Sume la Andrei"}, {"id": "casa_cot_310326", "tip": "intrare", "parte": "Lengyel Anita + Lengyel Ovidiu", "data": "31.03.2026", "suma": 800, "desc": "Cotizatii club ian-apr 2026 (2 x 400 RON)"}, {"id": "casa_bilete_310326", "tip": "intrare", "parte": "Lengyel Anita Larisa", "data": "31.03.2026", "suma": 1200, "desc": "3 bilete Cartare x 400 RON"}], "banca": [], "donatii": [{"id": "d1", "tip": "membru", "donator": "Membri fondatori", "data": "29.08.2025", "suma": 380, "mod": "Cash", "desc": "Donatie membrii la sedinta fondare"}], "protocol": [{"id": "p1", "desc": "Agapa Restaurant Aurora", "data": "27.11.2025", "suma": 1003, "platit": "", "mod": "Transfer bancar"}, {"id": "p2", "desc": "Eveniment caritabil Rotary Lion Bucuresti", "data": "29.01.2026", "suma": 1000, "platit": "Henciu Andrei", "mod": "Cash"}, {"id": "p3", "desc": "Fanioane personalizate 10 buc", "data": "12.02.2026", "suma": 405, "platit": "Henciu Andrei", "mod": "Cash"}, {"id": "p4", "desc": "RC Galati Donaris / PELS Cluj Napoca fam. Henciu", "data": "16.03.2026", "suma": 2900, "platit": "Henciu Andrei", "mod": "Transfer bancar"}, {"id": "p5", "desc": "Plata Ana Tanasie", "data": "24.03.2026", "suma": 1036, "platit": "Henciu Andrei", "mod": "Transfer bancar"}, {"id": "p6", "desc": "Sume la Andrei Henciu", "data": "28.03.2026", "suma": 64, "platit": "Henciu Andrei", "mod": "Cash"}], "incasari2": [{"id": "ii1", "data": "29.08.2025", "parte": "Membri fondatori", "suma": 380, "mod": "Cash", "desc": "Donatie fondare club"}, {"id": "ii2", "data": "27.11.2025", "parte": "Membri - sedinta 27.11.2025", "suma": 2600, "mod": "BT Pay", "desc": "Cotizatii sedinta"}, {"id": "ii3", "data": "15.01.2026", "parte": "Membri - sedinta 15.01.2026", "suma": 3000, "mod": "BT Pay", "desc": "Cotizatii sedinta"}, {"id": "ii4", "data": "29.01.2026", "parte": "Membri - sedinta 29.01.2026", "suma": 1250, "mod": "BT Pay", "desc": "Cotizatii sedinta"}, {"id": "ii5", "data": "12.02.2026", "parte": "Membri - sedinta 12.02.2026", "suma": 1650, "mod": "BT Pay", "desc": "Cotizatii sedinta"}, {"id": "ii6", "data": "26.02.2026", "parte": "Membri - sedinta 26.02.2026", "suma": 1050, "mod": "BT Pay", "desc": "Cotizatii sedinta"}, {"id": "ii7", "data": "05.03.2026", "parte": "Membri - sedinta 05.03.2026", "suma": 600, "mod": "BT Pay", "desc": "Cotizatii sedinta"}, {"id": "ii8", "data": "28.03.2026", "parte": "Membri - sedinta 28.03.2026", "suma": 1300, "mod": "BT Pay", "desc": "Cotizatii sedinta"}], "cheltuieli2": [{"id": "ci1", "data": "27.11.2025", "parte": "Restaurant Aurora", "suma": 1003, "mod": "Transfer bancar", "desc": "Agapa R.Aurora 27.11.2025"}, {"id": "ci2", "data": "20.01.2026", "parte": "Asoc. Rotary Ind. Distr.2241", "suma": 600, "mod": "Transfer bancar", "desc": "Cotizatie District 2241"}, {"id": "ci3", "data": "29.01.2026", "parte": "Rotary Lion Bucuresti", "suma": 1000, "mod": "Cash", "desc": "Eveniment caritabil (prin Andrei H.)"}, {"id": "ci4", "data": "30.01.2026", "parte": "Rotary International", "suma": 4372, "mod": "Transfer bancar", "desc": "Cotizatie RI 850 EUR sem.I"}, {"id": "ci5", "data": "12.02.2026", "parte": "Fanioane personalizate", "suma": 405, "mod": "Cash", "desc": "10 buc (prin Andrei H.)"}, {"id": "ci6", "data": "16.03.2026", "parte": "RC Galati / PELS Cluj Napoca", "suma": 2900, "mod": "Transfer bancar", "desc": "Fam. Henciu"}, {"id": "ci7", "data": "24.03.2026", "parte": "Ana Tanasie", "suma": 1036, "mod": "Transfer bancar", "desc": "Prin Andrei H."}, {"id": "ci8", "data": "28.03.2026", "parte": "Andrei Henciu", "suma": 64, "mod": "Cash", "desc": "Sume la Andrei"}], "riPayments": [{"id": "ri1", "benef": "District 2241", "suma": 600, "data": "20.01.2026", "desc": "Cotizatie District 2241 sem.I 2025-2026"}, {"id": "ri2", "benef": "Rotary International", "suma": 4372, "data": "30.01.2026", "desc": "Cotizatie Rotary International 850 EUR sem.I 2025-2026"}], "chitNr": 1, "bilete": [{"id": "bilet_cartare_310326", "eveniment": "Cartare", "data": "31.03.2026", "nrBilete": 3, "pretBilet": 400, "total": 1200, "platitor": "Lengyel Anita Larisa", "mod": "Cash", "obs": "3 bilete platite de Anita"}]}');DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rotary Club Satu Mare Cetate — Trezorerie</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --rot:#003F87;--rot2:#0056B3;--rot-l:#E8F0FB;
+  --gold:#C9A84C;--gold-p:#FFF8E7;
+  --text:#1a2a3a;--text2:#4a5a6a;--text3:#8a9aaa;
+  --bg:#f0f4f8;--bg2:#e4eaf2;--bg3:#d8e2ee;
+  --bdr:rgba(0,63,135,0.15);--bdr2:rgba(0,63,135,0.3);
+  --green:#2D6A4F;--gbg:#D8F3DC;
+  --red:#9B2335;--rbg:#FDECEA;
+  --amber:#8B4F00;--abg:#FFF0D6;
+  --r:10px;--sh:0 2px 16px rgba(0,63,135,0.10);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+h1,h2,h3{font-family:'Crimson Pro',serif;font-weight:600}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:230px;min-height:100vh;background:var(--rot);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:100}
+.sb-logo{padding:18px 18px 14px;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:10px}
+.sb-logo-icon{width:42px;height:42px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.sb-logo-text .loja{font-family:'Crimson Pro',serif;font-size:13px;color:white;font-weight:600;line-height:1.3}
+.sb-logo-text .sub{font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px}
+nav{flex:1;padding:10px 0}
+.ns{font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:1.5px;text-transform:uppercase;padding:12px 18px 4px}
+.ni{display:flex;align-items:center;gap:9px;padding:9px 18px;font-size:13px;color:rgba(255,255,255,0.6);cursor:pointer;transition:all 0.15s;border:none;background:none;width:100%;text-align:left;border-left:2px solid transparent}
+.ni:hover{color:white;background:rgba(255,255,255,0.08)}
+.ni.active{color:white;background:rgba(255,255,255,0.15);border-left-color:var(--gold);font-weight:500}
+.ni .ic{width:16px;text-align:center;font-size:13px}
+.sb-foot{padding:12px 18px;border-top:1px solid rgba(255,255,255,0.1);font-size:11px;color:rgba(255,255,255,0.3)}
+.main{margin-left:230px;flex:1;display:flex;flex-direction:column}
+.topbar{background:white;border-bottom:1px solid var(--bdr);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--sh)}
+.tb-title{font-family:'Crimson Pro',serif;font-size:20px;font-weight:600;color:var(--rot)}
+.tb-sub{font-size:12px;color:var(--text3);margin-top:1px}
+.tb-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.content{padding:24px 28px;flex:1}
+.btn{padding:7px 14px;font-size:13px;border-radius:7px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;border:none;display:inline-flex;align-items:center;gap:5px}
+.btn-rot{background:var(--rot);color:white}.btn-rot:hover{background:var(--rot2)}
+.btn-gold{background:var(--gold);color:white}.btn-gold:hover{opacity:.88}
+.btn-outline{background:transparent;border:1px solid var(--bdr2);color:var(--text2)}.btn-outline:hover{background:var(--bg2)}
+.btn-red{background:var(--red);color:white}.btn-red:hover{opacity:.88}
+.btn-sm{padding:4px 10px;font-size:12px}
+.btn-xs{padding:3px 8px;font-size:11px}
+.panel{display:none}.panel.active{display:block}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px}
+.metric{background:white;border:1px solid var(--bdr);border-radius:var(--r);padding:12px 14px}
+.metric-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+.metric-val{font-family:'Crimson Pro',serif;font-size:22px;font-weight:600}
+.mv-g{color:var(--green)}.mv-r{color:var(--red)}.mv-a{color:var(--amber)}.mv-b{color:var(--rot)}.mv-gold{color:var(--gold)}
+.card{background:white;border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);margin-bottom:16px}
+.card-hdr{padding:12px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;background:var(--bg2);flex-wrap:wrap;gap:8px}
+.card-title{font-family:'Crimson Pro',serif;font-size:15px;font-weight:600;color:var(--rot)}
+.card-body{padding:14px 16px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 10px;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);font-weight:500;border-bottom:1px solid var(--bdr);background:var(--bg2);white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid var(--bdr);color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--rot-l)}
+.td-actions{display:flex;gap:4px;align-items:center}
+.badge{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500;white-space:nowrap;display:inline-block}
+.bg-green{background:var(--gbg);color:var(--green)}
+.bg-red{background:var(--rbg);color:var(--red)}
+.bg-amber{background:var(--abg);color:var(--amber)}
+.bg-blue{background:var(--rot-l);color:var(--rot)}
+.bg-gold{background:var(--gold-p);color:var(--amber)}
+.filter-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.fi{padding:7px 11px;font-size:13px;border:1px solid var(--bdr2);border-radius:7px;background:white;color:var(--text);font-family:'DM Sans',sans-serif}
+.fi:focus{outline:none;border-color:var(--rot)}
+.fi-wide{flex:1;min-width:160px}
+.fb{padding:5px 12px;font-size:12px;border:1px solid var(--bdr);border-radius:20px;background:white;color:var(--text2);cursor:pointer;transition:all 0.15s}
+.fb.active{background:var(--rot);color:white;border-color:var(--rot)}
+.fb:hover:not(.active){border-color:var(--rot2);color:var(--rot)}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:white;border-radius:14px;width:90%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 48px rgba(0,0,0,0.3)}
+.modal-hdr{padding:18px 22px 14px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-family:'Crimson Pro',serif;font-size:17px;font-weight:600;color:var(--rot)}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3)}
+.modal-body{padding:18px 22px}
+.modal-foot{padding:10px 22px 18px;display:flex;gap:8px;justify-content:flex-end;align-items:center}
+.fg{margin-bottom:12px}
+.fl{font-size:12px;color:var(--text2);margin-bottom:3px;display:block;font-weight:500}
+.fi2{width:100%;padding:8px 10px;font-size:13px;border:1px solid var(--bdr2);border-radius:7px;background:white;color:var(--text);font-family:'DM Sans',sans-serif}
+.fi2:focus{outline:none;border-color:var(--rot)}
+textarea.fi2{min-height:60px;resize:vertical}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.itabs{display:flex;border-bottom:1px solid var(--bdr);margin-bottom:18px}
+.itab{padding:8px 16px;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;color:var(--text3);background:none;border-top:none;border-left:none;border-right:none;font-family:'DM Sans',sans-serif;margin-bottom:-1px;transition:all .15s}
+.itab.active{color:var(--rot);border-bottom-color:var(--rot);font-weight:500}
+.empty{text-align:center;padding:32px 16px;color:var(--text3)}
+.prog-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px}
+.prog-name{width:160px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prog-track{flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px}
+.pf-full{background:var(--green)}.pf-part{background:#E9A400}.pf-none{background:#E24B4A;opacity:.3}
+.prog-amt{width:80px;text-align:right;color:var(--text3);font-size:11px}
+#print-area{display:none}
+@media print{body>*{display:none!important}#print-area{display:block!important;padding:20px;font-family:'DM Sans',sans-serif}}
+</style>
+</head>
+<body>
+<div id="print-area"></div>
+<div class="layout">
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">⚙️</div>
+    <div class="sb-logo-text">
+      <div class="loja">Rotary Club<br>Satu Mare Cetate</div>
+      <div class="sub">Trezorerie · 2025-2026</div>
+    </div>
+  </div>
+  <nav>
+    <div class="ns">Cotizații</div>
+    <button class="ni active" onclick="nav('cotizatii',this)"><span class="ic">👥</span>Situație cotizații</button>
+    <div class="ns">Financiar</div>
+    <button class="ni" onclick="nav('donatii',this)"><span class="ic">🎁</span>Donații</button>
+    <button class="ni" onclick="nav('casa',this)"><span class="ic">💵</span>Registru casă</button>
+    <button class="ni" onclick="nav('banca',this)"><span class="ic">🏦</span>Jurnal bancă</button>
+    <div class="ns">Plăți externe</div>
+    <button class="ni" onclick="nav('rotary_int',this)"><span class="ic">🌍</span>Rotary Intl / District</button>
+    <button class="ni" onclick="nav('protocol',this)"><span class="ic">🍽</span>Protocol & Evenimente</button>
+    <button class="ni" onclick="nav('bilete',this)"><span class="ic">🎟</span>Bilete & Evenimente</button>
+    <div class="ns">Analiză</div>
+    <button class="ni" onclick="nav('rapoarte',this)"><span class="ic">📊</span>Rapoarte</button>
+  </nav>
+  <div class="sb-foot">v1.0 · RC SM Cetate · 2026</div>
+</aside>
+<div class="main">
+<div class="topbar">
+  <div>
+    <div class="tb-title" id="tb-title">Cotizații membri</div>
+    <div class="tb-sub" id="tb-sub">100 RON/lună per membru</div>
+  </div>
+  <div class="tb-actions">
+    <button class="btn btn-outline btn-sm" onclick="exportJSON()">⬇ Backup</button>
+    <button class="btn btn-outline btn-sm" onclick="document.getElementById('import-f').click()">⬆ Import</button>
+    <input type="file" id="import-f" style="display:none" accept=".json" onchange="importJSON(event)">
+    <button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red)" onclick="resetData()">↺ Reset</button>
+  </div>
+</div>
+<div class="content">
+
+<!-- COTIZATII -->
+<div id="p-cotizatii" class="panel active">
+  <div class="metrics" id="cot-metrics"></div>
+  <div class="filter-row">
+    <button class="btn btn-rot btn-sm" onclick="openIncasareModal()">+ Înregistrează plată</button>
+    <button class="btn btn-outline btn-sm" onclick="openAddMemModal()">👤 + Adaugă membru</button>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV('cot')">⬇ CSV</button>
+    <button class="btn btn-outline btn-sm" onclick="printTable('cot')">🖨 Listează</button>
+    <input class="fi fi-wide" type="text" id="cot-q" placeholder="🔍 Caută după nume..." oninput="renderCot()">
+    <select class="fi" id="cot-an" onchange="renderCotMetrics();renderCot()">
+      <option value="2026">2026 (ian–iun 2026)</option>
+      <option value="2025">2025 (nov–dec 2025)</option>
+      <option value="all">Ambii ani</option>
+    </select>
+    <button class="fb active" onclick="setF('all',this)">Toți</button>
+    <button class="fb" onclick="setF('paid',this)">Achitat</button>
+    <button class="fb" onclick="setF('partial',this)">Parțial</button>
+    <button class="fb" onclick="setF('unpaid',this)">Restant</button>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">Membri RC Satu Mare Cetate</span></div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr>
+        <th>Rol</th><th>Nume</th><th>ID Rotary</th>
+        <th>Cotizație anuală</th><th>Încasat</th><th>Rest club</th>
+        <th>Rest RI</th><th>Status</th><th></th>
+      </tr></thead>
+      <tbody id="cot-tbody"></tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- DONATII -->
+<div id="p-donatii" class="panel">
+  <div class="metrics" id="don-metrics"></div>
+  <div class="filter-row">
+    <button class="btn btn-rot btn-sm" onclick="openDonModal(null)">+ Adaugă donație</button>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV('don')">⬇ CSV</button>
+    <button class="btn btn-outline btn-sm" onclick="printTable('donatii')">🖨 Listează</button>
+    <input class="fi fi-wide" type="text" id="don-q" placeholder="🔍 Caută..." oninput="renderDon()">
+    <select class="fi" id="don-tip-f" onchange="renderDon()">
+      <option value="all">Toate</option>
+      <option value="membru">Membri</option>
+      <option value="extern">Externi</option>
+    </select>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">Registru donații</span></div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr><th>Tip</th><th>Donator</th><th>Data</th><th>Suma (RON)</th><th>Scop / Descriere</th><th></th></tr></thead>
+      <tbody id="don-tbody"></tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTRU CASA -->
+<div id="p-casa" class="panel">
+  <div class="metrics" id="casa-metrics"></div>
+  <div class="filter-row">
+    <button class="btn btn-rot btn-sm" onclick="openTranzModal('casa',null)">+ Adaugă înregistrare</button>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV('casa')">⬇ CSV</button>
+    <button class="btn btn-outline btn-sm" onclick="printTable('casa')">🖨 Listează</button>
+    <input class="fi fi-wide" type="text" id="casa-q" placeholder="🔍 Caută..." oninput="renderCasa()">
+    <select class="fi" id="casa-tip-f" onchange="renderCasa()"><option value="all">Toate</option><option value="intrare">Intrări</option><option value="iesire">Ieșiri</option></select>
+    <input class="fi" type="month" id="casa-luna" onchange="renderCasa()">
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">Registru casă</span><span id="casa-sold" style="font-size:13px;font-weight:500"></span></div>
+    <div style="overflow-x:auto">
+    <table><thead><tr><th>Tip</th><th>Platitor/Beneficiar</th><th>Data</th><th>Suma (RON)</th><th>Descriere</th><th></th></tr></thead>
+    <tbody id="casa-tbody"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- JURNAL BANCA -->
+<div id="p-banca" class="panel">
+  <div class="metrics" id="banca-metrics"></div>
+  <div class="filter-row">
+    <button class="btn btn-rot btn-sm" onclick="openTranzModal('banca',null)">+ Adaugă tranzacție</button>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV('banca')">⬇ CSV</button>
+    <button class="btn btn-outline btn-sm" onclick="printTable('banca')">🖨 Listează</button>
+    <input class="fi fi-wide" type="text" id="banca-q" placeholder="🔍 Caută..." oninput="renderBanca()">
+    <select class="fi" id="banca-tip-f" onchange="renderBanca()"><option value="all">Toate</option><option value="intrare">Credite</option><option value="iesire">Debite</option></select>
+    <input class="fi" type="month" id="banca-luna" onchange="renderBanca()">
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">Jurnal bancă</span><span id="banca-sold" style="font-size:13px;font-weight:500"></span></div>
+    <div style="overflow-x:auto">
+    <table><thead><tr><th>Tip</th><th>Platitor/Beneficiar</th><th>Data</th><th>Suma (RON)</th><th>Descriere</th><th></th></tr></thead>
+    <tbody id="banca-tbody"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ROTARY INT -->
+<div id="p-rotary_int" class="panel">
+  <div class="metrics" id="ri-metrics"></div>
+  <div class="filter-row">
+    <button class="btn btn-rot btn-sm" onclick="openRIModal()">+ Înregistrează plată</button>
+    <button class="btn btn-outline btn-sm" onclick="printTable('ri')">🖨 Listează</button>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">Plăți efectuate</span></div>
+      <div class="card-body" id="ri-plati"></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">Obligații / informații</span></div>
+      <div class="card-body">
+        <div style="font-size:13px;line-height:1.8">
+          <div>🌍 <b>Rotary International</b></div>
+          <div style="color:var(--text3);font-size:12px">Cotizație semestrială per membru</div>
+          <div style="margin-top:8px">🏛 <b>District 2241</b></div>
+          <div style="color:var(--text3);font-size:12px">Cotizație anuală district</div>
+          <div style="margin-top:8px">📅 <b>Termene:</b></div>
+          <div style="color:var(--text3);font-size:12px">Semestrul I: iulie · Semestrul II: ianuarie</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROTOCOL -->
+<div id="p-protocol" class="panel">
+  <div class="metrics" id="prot-metrics"></div>
+  <div class="filter-row">
+    <button class="btn btn-rot btn-sm" onclick="openProtModal(null)">+ Adaugă cheltuială</button>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV('protocol')">⬇ CSV</button>
+    <button class="btn btn-outline btn-sm" onclick="printTable('protocol')">🖨 Listează</button>
+    <input class="fi fi-wide" type="text" id="prot-q" placeholder="🔍 Caută..." oninput="renderProt()">
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">Protocol & Cheltuieli evenimente</span></div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr><th>Eveniment / Descriere</th><th>Data</th><th>Suma (RON)</th><th>Plătit de</th><th>Mod</th><th></th></tr></thead>
+      <tbody id="prot-tbody"></tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- BILETE -->
+<div id="p-bilete" class="panel">
+  <div class="metrics" id="bilete-metrics"></div>
+  <div class="filter-row">
+    <button class="btn btn-rot btn-sm" onclick="openBiletModal(null)">+ Adaugă bilete</button>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV('bilete')">⬇ CSV</button>
+    <input class="fi fi-wide" type="text" id="bilete-q" placeholder="🔍 Caută eveniment..." oninput="renderBilete()">
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">Registru bilete & evenimente</span></div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr>
+        <th>Eveniment</th><th>Data</th><th>Nr. bilete</th>
+        <th>Preț/bilet</th><th>Total</th><th>Platitor</th><th>Mod</th><th>Obs.</th><th></th>
+      </tr></thead>
+      <tbody id="bilete-tbody"></tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL BILET -->
+<div class="overlay" id="m-bilet">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title" id="m-bilet-title">Bilete eveniment</span><button class="modal-close" onclick="closeModal('m-bilet')">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="bilet-eid">
+      <div class="fg"><label class="fl">Eveniment *</label><input class="fi2" type="text" id="bilet-ev" placeholder="ex: Cartare, Gala, Conferinta..."></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Data</label><input class="fi2" type="date" id="bilet-data"></div>
+        <div class="fg"><label class="fl">Nr. bilete *</label><input class="fi2" type="number" id="bilet-nr" min="1" placeholder="ex: 3" oninput="calcBiletTotal()"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Preț per bilet (RON) *</label><input class="fi2" type="number" id="bilet-pret" placeholder="ex: 400" oninput="calcBiletTotal()"></div>
+        <div class="fg"><label class="fl">Total (RON)</label><input class="fi2" type="number" id="bilet-total" placeholder="calculat automat" readonly style="background:var(--bg2)"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Platitor</label><input class="fi2" type="text" id="bilet-platitor" placeholder="ex: Lengyel Anita"></div>
+        <div class="fg"><label class="fl">Mod plată</label>
+          <select class="fi2" id="bilet-mod"><option>Cash</option><option>Transfer bancar</option><option>BT Pay</option><option>Card</option></select>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Observații</label><input class="fi2" type="text" id="bilet-obs"></div>
+    </div>
+    <div class="modal-foot" id="bilet-foot">
+      <button class="btn btn-outline" onclick="closeModal('m-bilet')">Anulează</button>
+      <button class="btn btn-rot" onclick="saveBilet()">Salvează</button>
+    </div>
+  </div>
+</div>
+
+<!-- RAPOARTE -->
+<div id="p-rapoarte" class="panel">
+  <div class="filter-row">
+    <button class="btn btn-outline btn-sm" onclick="printTable('rap')">🖨 Listează raport</button>
+  </div>
+  <div class="metrics" id="rap-metrics"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">Colectare cotizații</span></div>
+      <div class="card-body" id="rap-prog"></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">Restanțieri</span></div>
+      <div class="card-body" id="rap-rest"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">Solduri & sumar financiar</span></div>
+    <div class="card-body" id="rap-solduri"></div>
+  </div>
+</div>
+
+</div></div></div>
+
+<!-- MODALS -->
+<div class="overlay" id="m-incasare">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title">Înregistrare plată cotizație</span><button class="modal-close" onclick="closeModal('m-incasare')">×</button></div>
+    <div class="modal-body">
+      <div class="fg"><label class="fl">Membru *</label><select class="fi2" id="inc-mem"><option value="">— alege —</option></select><div id="inc-warn" style="margin-top:4px"></div></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Suma (RON) *</label><input class="fi2" type="number" id="inc-suma" placeholder="ex: 100"></div>
+        <div class="fg"><label class="fl">Data *</label><input class="fi2" type="date" id="inc-data"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Mod plată</label>
+          <select class="fi2" id="inc-mod"><option>Cash</option><option>BT Pay</option><option>Transfer bancar</option><option>Altă metodă</option></select>
+        </div>
+        <div class="fg"><label class="fl">Luni acoperite</label>
+          <input class="fi2" type="text" id="inc-luni" placeholder="ex: ian-feb 2026">
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Observații</label><input class="fi2" type="text" id="inc-obs"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('m-incasare')">Anulează</button>
+      <button class="btn btn-rot" onclick="saveIncasare()">Salvează & chitanță</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="m-chitanta">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title">Chitanță emisă</span><button class="modal-close" onclick="closeModal('m-chitanta')">×</button></div>
+    <div class="modal-body" id="m-chitanta-body"></div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('m-chitanta')">Închide</button>
+      <button class="btn btn-rot" onclick="printChitanta()">🖨 Printează</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="m-addmem">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title">👤 Adaugă membru nou</span><button class="modal-close" onclick="closeModal('m-addmem')">×</button></div>
+    <div class="modal-body">
+      <div class="frow">
+        <div class="fg"><label class="fl">Nume complet *</label><input class="fi2" type="text" id="am-nume" placeholder="ex: Ionescu Ioan"></div>
+        <div class="fg"><label class="fl">ID Rotary</label><input class="fi2" type="text" id="am-id" placeholder="ex: 12345678"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Rol în club</label><input class="fi2" type="text" id="am-rol" placeholder="ex: Club Member"></div>
+        <div class="fg"><label class="fl">Telefon</label><input class="fi2" type="text" id="am-tel" placeholder="07xx xxx xxx"></div>
+      </div>
+      <div class="fg"><label class="fl">Email</label><input class="fi2" type="email" id="am-email"></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Cotizație anuală (RON)</label><input class="fi2" type="number" id="am-cot" value="1200" placeholder="1200"></div>
+        <div class="fg"><label class="fl">An fiscal</label><select class="fi2" id="am-an"><option value="2026">2025-2026</option><option value="2025">2024-2025</option></select></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('m-addmem')">Anulează</button>
+      <button class="btn btn-rot" onclick="saveNewMember()">Adaugă</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="m-tranz">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title" id="m-tranz-title">Înregistrare</span><button class="modal-close" onclick="closeModal('m-tranz')">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="tranz-type">
+      <div class="frow">
+        <div class="fg"><label class="fl">Tip</label><select class="fi2" id="tranz-tip"><option value="intrare">▲ Intrare</option><option value="iesire">▼ Ieșire</option></select></div>
+        <div class="fg"><label class="fl">Data</label><input class="fi2" type="date" id="tranz-data"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Platitor / Beneficiar</label><input class="fi2" type="text" id="tranz-parte"></div>
+        <div class="fg"><label class="fl">Suma (RON)</label><input class="fi2" type="number" id="tranz-suma"></div>
+      </div>
+      <div class="fg"><label class="fl">Descriere</label><input class="fi2" type="text" id="tranz-desc"></div>
+    </div>
+    <div class="modal-foot" id="tranz-foot">
+      <button class="btn btn-outline" onclick="closeModal('m-tranz')">Anulează</button>
+      <button class="btn btn-rot" onclick="saveTranz()">Salvează</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="m-don">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title" id="m-don-title">Donație</span><button class="modal-close" onclick="closeModal('m-don')">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="don-eid">
+      <div class="frow">
+        <div class="fg"><label class="fl">Tip donator</label><select class="fi2" id="don-etp"><option value="membru">Membru club</option><option value="extern">Extern (non-membru)</option></select></div>
+        <div class="fg"><label class="fl">Data</label><input class="fi2" type="date" id="don-edata"></div>
+      </div>
+      <div class="fg"><label class="fl">Donator *</label><input class="fi2" type="text" id="don-enum" placeholder="Nume donator"></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Suma (RON) *</label><input class="fi2" type="number" id="don-esuma"></div>
+        <div class="fg"><label class="fl">Mod</label><select class="fi2" id="don-emod"><option>Cash</option><option>Transfer bancar</option><option>BT Pay</option><option>Altă metodă</option></select></div>
+      </div>
+      <div class="fg"><label class="fl">Scop / Descriere</label><input class="fi2" type="text" id="don-edesc" placeholder="ex: Donatie caritabila, Fond eveniment..."></div>
+    </div>
+    <div class="modal-foot" id="don-efoot">
+      <button class="btn btn-outline" onclick="closeModal('m-don')">Anulează</button>
+      <button class="btn btn-rot" onclick="saveDon()">Salvează</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="m-ri">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title">Plată Rotary Intl / District</span><button class="modal-close" onclick="closeModal('m-ri')">×</button></div>
+    <div class="modal-body">
+      <div class="fg"><label class="fl">Beneficiar</label>
+        <select class="fi2" id="ri-benef">
+          <option value="ri">Rotary International</option>
+          <option value="dist">District 2241</option>
+          <option value="alt">Alt beneficiar</option>
+        </select>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Suma (RON)</label><input class="fi2" type="number" id="ri-suma"></div>
+        <div class="fg"><label class="fl">Data</label><input class="fi2" type="date" id="ri-data"></div>
+      </div>
+      <div class="fg"><label class="fl">Referință / Descriere</label><input class="fi2" type="text" id="ri-desc" placeholder="ex: Cotizatie RI sem.II 2025-2026"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('m-ri')">Anulează</button>
+      <button class="btn btn-rot" onclick="saveRI()">Salvează</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="m-prot">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title" id="m-prot-title">Cheltuială protocol</span><button class="modal-close" onclick="closeModal('m-prot')">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="prot-eid">
+      <div class="frow">
+        <div class="fg"><label class="fl">Data</label><input class="fi2" type="date" id="prot-edata"></div>
+        <div class="fg"><label class="fl">Suma (RON) *</label><input class="fi2" type="number" id="prot-esuma"></div>
+      </div>
+      <div class="fg"><label class="fl">Eveniment / Descriere *</label><input class="fi2" type="text" id="prot-edesc" placeholder="ex: Agapă 27.11.2025 - Restaurant Aurora"></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Plătit de</label><input class="fi2" type="text" id="prot-eplatit" placeholder="ex: Henciu Andrei"></div>
+        <div class="fg"><label class="fl">Mod</label><select class="fi2" id="prot-emod"><option>Cash</option><option>Card</option><option>Transfer bancar</option><option>BT Pay</option></select></div>
+      </div>
+    </div>
+    <div class="modal-foot" id="prot-efoot">
+      <button class="btn btn-outline" onclick="closeModal('m-prot')">Anulează</button>
+      <button class="btn btn-rot" onclick="saveProt()">Salvează</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="m-fisa">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-hdr"><span class="modal-title">Fișă membru</span><button class="modal-close" onclick="closeModal('m-fisa')">×</button></div>
+    <div class="modal-body" id="m-fisa-body"></div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('m-fisa')">Închide</button>
+      <button class="btn btn-rot" onclick="printFisa()">🖨 Printează</button>
+    </div>
+  </div>
+</div>
+
+
 
 <div class="overlay" id="m-tranz2">
   <div class="modal">
